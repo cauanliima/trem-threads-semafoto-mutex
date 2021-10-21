@@ -7,7 +7,6 @@
     <ItemGroup>
       <Folder Include="APP" />
       <Folder Include="DTOs" />
-      <Folder Include="E-Edital" />
       <Folder Include="QueryParams" />
     </ItemGroup>
 

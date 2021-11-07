@@ -20,6 +20,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Repository\CHESF.COMPRAS.Repository\CHESF.COMPRAS.Repository.csproj" />
+      <ProjectReference Include="..\..\Service\CHESF.COMPRAS.IService\CHESF.COMPRAS.IService.csproj" />
+      <ProjectReference Include="..\..\Service\CHESF.COMPRAS.Service\CHESF.COMPRAS.Service.csproj" />
     </ItemGroup>
 
 </Project>

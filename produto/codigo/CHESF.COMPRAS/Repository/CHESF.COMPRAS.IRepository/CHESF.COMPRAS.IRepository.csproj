@@ -10,4 +10,9 @@
     </ItemGroup>
 
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Domain\CHESF.COMPRAS.Domain\CHESF.COMPRAS.Domain.csproj" />
+    </ItemGroup>
+
+
 </Project>

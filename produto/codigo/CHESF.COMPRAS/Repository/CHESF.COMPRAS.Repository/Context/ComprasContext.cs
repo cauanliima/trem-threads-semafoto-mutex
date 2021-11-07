@@ -14,11 +14,13 @@ namespace CHESF.BSV.Repository.Context
         }
 
         public virtual DbSet<Licitacao> Licitacaos { get; set; }
+        public virtual DbSet<Anexo> Anexos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Licitacao>();
-      
+            modelBuilder.Entity<Anexo>();
+
             base.OnModelCreating(modelBuilder);
         }
     }

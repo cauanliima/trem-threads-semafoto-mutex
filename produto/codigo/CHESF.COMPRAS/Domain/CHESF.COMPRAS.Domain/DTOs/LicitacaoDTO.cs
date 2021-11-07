@@ -7,7 +7,7 @@ namespace CHESF.COMPRAS.Domain.DTOs
     public class LicitacaoDTO
     {
         public int Codigo { get; set; }
-        public string Nome { get; set; }
+        public string Modalidade { get; set; }
         public string Descricao { get; set; }
         public string Numero { get; set; }
         public DateTime DataEnvioFinal { get; set; }

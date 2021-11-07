@@ -13,7 +13,7 @@ namespace CHESF.COMPRAS.Repository.Base
     public class RepositoryBase<T> : IRepositoryBase<T> where T : class
     {
         protected readonly IUnitOfWork UnitOfWork;
-        private DbSet<T> _entities;
+        protected DbSet<T> _entities;
         
         public RepositoryBase(IUnitOfWork unitOfWork)
         {

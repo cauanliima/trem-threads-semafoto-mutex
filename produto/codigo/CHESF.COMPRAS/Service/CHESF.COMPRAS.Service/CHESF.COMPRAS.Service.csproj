@@ -4,4 +4,9 @@
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Repository\CHESF.COMPRAS.IRepository\CHESF.COMPRAS.IRepository.csproj" />
+      <ProjectReference Include="..\CHESF.COMPRAS.IService\CHESF.COMPRAS.IService.csproj" />
+    </ItemGroup>
+
 </Project>

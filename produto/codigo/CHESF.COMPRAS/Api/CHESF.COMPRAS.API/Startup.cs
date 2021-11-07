@@ -3,10 +3,14 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using CHESF.BSV.Repository.Context;
+using CHESF.COMPRAS.IRepository;
 using CHESF.COMPRAS.IRepository.Base;
 using CHESF.COMPRAS.IRepository.UnitOfWork;
+using CHESF.COMPRAS.IService;
+using CHESF.COMPRAS.Repository;
 using CHESF.COMPRAS.Repository.Base;
 using CHESF.COMPRAS.Repository.UnitOfWork;
+using CHESF.COMPRAS.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -82,7 +86,7 @@ namespace CHESF.COMPRAS.API
             #region DADOS DE CONTEXT E IoC
 
             services.AddDbContext<ComprasContext>(options => options
-                .UseSqlServer(Environment.GetEnvironmentVariable("COMPRAS_CONNECTION"))
+                .UseSqlServer(Environment.GetEnvironmentVariable("EEDITAL_CONNECTION"))
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
             services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
@@ -91,8 +95,12 @@ namespace CHESF.COMPRAS.API
 
 
             //Repository
+            services.AddTransient<ILicitacaoRepository, LicitacaoRepository>();
+            services.AddTransient<IAnexoRepository, AnexoRepository>();
 
             //Service
+            services.AddTransient<ILicitacaoService, LicitacaoService>();
+            services.AddTransient<IAnexoService, AnexoService>();
 
             #endregion
 
@@ -155,7 +163,7 @@ namespace CHESF.COMPRAS.API
                 options.AllowAnyOrigin()
                     .AllowAnyMethod()
                     .AllowAnyHeader());
-            
+
             app.UseStaticFiles();
 
             app.UseSwagger();

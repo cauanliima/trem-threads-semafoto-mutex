@@ -16,10 +16,19 @@ namespace CHESF.COMPRAS.Domain.E_Edital
         [Column("IC_CRITERIO")] public char? CriterioJulgamento { get; set; }
 
         [Column("DT_AQUISICAO_EDITAL")] public DateTime? AberturaPropostas { get; set; }
-        
+
         [NotMapped] public DateTime? DataEnvioInicial { get; set; }
         [NotMapped] public DateTime? DataEnvioFinal { get; set; }
 
-        public string Numero => Codigo.ToString();
+        public string Numero
+        {
+            get
+            {
+                var c = Codigo.ToString();
+                int tamanho = c.Length;
+                return
+                    $"{c.Substring(0, tamanho - 4)}/{c.Substring(tamanho - 4)}";
+            }
+        }
     }
 }

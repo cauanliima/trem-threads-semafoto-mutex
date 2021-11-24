@@ -6,6 +6,7 @@ using CHESF.COMPRAS.Domain.E_Edital;
 using CHESF.COMPRAS.Domain.QueryParams;
 using CHESF.COMPRAS.IRepository;
 using CHESF.COMPRAS.IService;
+using Microsoft.EntityFrameworkCore;
 
 namespace CHESF.COMPRAS.Service
 {
@@ -25,8 +26,8 @@ namespace CHESF.COMPRAS.Service
 
         public async Task<IEnumerable<Licitacao>> Listar(ListaQueryParams queryParams)
         {
-            return (await _repository.GetByCondition(l => l.Status.Equals("PU"), pagina: queryParams.pagina,
-                total: queryParams.total)).OrderByDescending(l => l.AberturaPropostas);
+            return await _repository.GetLicitacoesOrdenadas(l => l.Status.Equals("PU"), queryParams.pagina * queryParams.total,
+                queryParams.total);
         }
 
         public async Task<IEnumerable<Licitacao>> Listar(LicitacaoFiltroQueryParams filtro)
@@ -54,11 +55,12 @@ namespace CHESF.COMPRAS.Service
 
             if (filtro.texto != null)
             {
-                licitacoes =
-                    licitacoes.Where(l => l.Descricao.ToUpper().Contains(filtro.texto.ToUpper()));
+                licitacoes = licitacoes.Where(l =>
+                    l.Codigo.ToString().Contains(filtro.texto) ||
+                        l.Descricao.ToUpper().Contains(filtro.texto.ToUpper()));
             }
 
-            return licitacoes.Skip(filtro.pagina).Take(filtro.total);
+            return licitacoes.Skip(filtro.pagina * filtro.total).Take(filtro.total);
         }
     }
 }

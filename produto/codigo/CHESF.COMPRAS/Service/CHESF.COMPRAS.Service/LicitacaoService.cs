@@ -26,9 +26,16 @@ namespace CHESF.COMPRAS.Service
 
         public async Task<IEnumerable<Licitacao>> Listar(ListaQueryParams queryParams)
         {
-            return await _repository.GetLicitacoesOrdenadas(l => l.Status.Equals("PU"), queryParams.pagina * queryParams.total,
+            return await _repository.GetLicitacoesOrdenadas(l => l.Status.Equals("PU"),
+                queryParams.pagina * queryParams.total,
                 queryParams.total);
         }
+
+        public async Task<IEnumerable<Licitacao>> Listar(LicitacoesFavoritadasQueryParams filtroQuery)
+        {
+            return await _repository.GetByCondition(l => filtroQuery.ids.Contains(l.Codigo));
+        }
+
 
         public async Task<IEnumerable<Licitacao>> Listar(LicitacaoFiltroQueryParams filtro)
         {
@@ -57,7 +64,7 @@ namespace CHESF.COMPRAS.Service
             {
                 licitacoes = licitacoes.Where(l =>
                     l.Codigo.ToString().Contains(filtro.texto) ||
-                        l.Descricao.ToUpper().Contains(filtro.texto.ToUpper()));
+                    l.Descricao.ToUpper().Contains(filtro.texto.ToUpper()));
             }
 
             return licitacoes.Skip(filtro.pagina * filtro.total).Take(filtro.total);

@@ -12,5 +12,6 @@ namespace CHESF.COMPRAS.IService
 
         Task<IEnumerable<Licitacao>> Listar(ListaQueryParams queryParams);
         Task<IEnumerable<Licitacao>> Listar(LicitacaoFiltroQueryParams filtroQuery);
+        Task<IEnumerable<Licitacao>> Listar(LicitacoesFavoritadasQueryParams filtroQuery);
     }
 }

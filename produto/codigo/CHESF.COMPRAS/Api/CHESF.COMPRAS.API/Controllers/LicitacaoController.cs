@@ -54,6 +54,22 @@ namespace CHESF.COMPRAS.API.Controllers
         }
 
         [HttpGet]
+        [Route("favoritadas")]
+        public async Task<ActionResult<List<LicitacaoDTO>>> ListarComFiltro(
+            [FromQuery] LicitacoesFavoritadasQueryParams queryParams)
+        {
+            try
+            {
+                var licitacoes = await _service.Listar(queryParams);
+                return Ok(licitacoes);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Ocorreu um erro ao buscar as informações. Erro: {ex}");
+            }
+        }
+
+        [HttpGet]
         [Route("{id:long}")]
         public async Task<ActionResult<Licitacao>> Buscar(long id)
         {

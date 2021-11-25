@@ -7,11 +7,25 @@ namespace CHESF.COMPRAS.Domain.E_Edital
     [Table("TB_LICITACAO", Schema = "dbo")]
     public class Licitacao
     {
+        private string _modalidade;
+        private string _status;
         [Key] [Column("NR_PRCS")] public long Codigo { get; set; }
 
-        [Column("IC_MODALIDADE")] public string Modalidade { get; set; }
+        [Column("IC_MODALIDADE")]
+        public string Modalidade
+        {
+            get => _modalidade.Trim();
+            set => _modalidade = value;
+        }
+
         [Column("DS_PRCS")] public string? Descricao { get; set; }
-        [Column("IC_STATUS")] public string Status { get; set; }
+
+        [Column("IC_STATUS")]
+        public string Status
+        {
+            get => _status.Trim();
+            set => _status = value;
+        }
 
         [Column("IC_CRITERIO")] public char? CriterioJulgamento { get; set; }
 

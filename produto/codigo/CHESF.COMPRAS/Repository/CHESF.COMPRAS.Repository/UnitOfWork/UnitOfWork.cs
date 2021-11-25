@@ -1,4 +1,4 @@
-using CHESF.BSV.Repository.Context;
+using CHESF.COMPRAS.Repository.Context;
 using CHESF.COMPRAS.IRepository.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 

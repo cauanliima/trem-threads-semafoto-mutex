@@ -1,7 +1,7 @@
 using CHESF.COMPRAS.Domain.E_Edital;
 using Microsoft.EntityFrameworkCore;
 
-namespace CHESF.BSV.Repository.Context
+namespace CHESF.COMPRAS.Repository.Context
 {
     public class ComprasContext : DbContext
     {

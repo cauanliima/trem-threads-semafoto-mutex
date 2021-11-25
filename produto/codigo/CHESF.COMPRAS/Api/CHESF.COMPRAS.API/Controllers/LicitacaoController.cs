@@ -55,11 +55,12 @@ namespace CHESF.COMPRAS.API.Controllers
 
         [HttpGet]
         [Route("favoritadas")]
-        public async Task<ActionResult<List<LicitacaoDTO>>> ListarComFiltro(
+        public async Task<ActionResult<List<LicitacaoDTO>>> ListarFavoritas(
             [FromQuery] LicitacoesFavoritadasQueryParams queryParams)
         {
             try
             {
+                if (queryParams.ids.Count == 0) return NotFound();
                 var licitacoes = await _service.Listar(queryParams);
                 return Ok(licitacoes);
             }

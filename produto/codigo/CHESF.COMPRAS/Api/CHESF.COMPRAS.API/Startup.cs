@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using CHESF.BSV.Repository.Context;
+using CHESF.COMPRAS.Repository.Context;
 using CHESF.COMPRAS.IRepository;
 using CHESF.COMPRAS.IRepository.Base;
 using CHESF.COMPRAS.IRepository.UnitOfWork;

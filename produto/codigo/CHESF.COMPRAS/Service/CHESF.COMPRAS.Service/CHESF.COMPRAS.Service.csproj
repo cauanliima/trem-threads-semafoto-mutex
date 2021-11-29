@@ -9,4 +9,8 @@
       <ProjectReference Include="..\CHESF.COMPRAS.IService\CHESF.COMPRAS.IService.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
+    </ItemGroup>
+
 </Project>

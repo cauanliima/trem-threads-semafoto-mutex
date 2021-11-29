@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using CHESF.COMPRAS.Domain.APP;
 using CHESF.COMPRAS.Repository.Context;
 using CHESF.COMPRAS.IRepository;
 using CHESF.COMPRAS.IRepository.Base;
@@ -58,12 +59,6 @@ namespace CHESF.COMPRAS.API
 
             services.AddCors();
             services.AddHttpContextAccessor();
-            // services.AddHttpClient<AuthController>("SISAUTH", c =>
-            // {
-            //     c.BaseAddress = new Uri(Configuration["SISAUTH_URL"] + "/auth");
-            //     c.DefaultRequestHeaders.Add("Accept", "*/*");
-            //     c.DefaultRequestHeaders.Add("User-Agent", "HttpClientFactory-Sample");
-            // });
 
             services.AddAuthentication(x =>
             {
@@ -82,6 +77,10 @@ namespace CHESF.COMPRAS.API
                     ValidateAudience = false
                 };
             });
+            
+            services.AddOptions<NotificationHubOptions>()
+                .Configure(Configuration.GetSection("NotificationHub").Bind)
+                .ValidateDataAnnotations();
 
             #region DADOS DE CONTEXT E IoC
 
@@ -101,6 +100,7 @@ namespace CHESF.COMPRAS.API
             //Service
             services.AddTransient<ILicitacaoService, LicitacaoService>();
             services.AddTransient<IAnexoService, AnexoService>();
+            services.AddTransient<INotificationService, NotificationService>();
 
             #endregion
 

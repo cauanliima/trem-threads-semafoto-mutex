@@ -108,12 +108,12 @@ namespace CHESF.COMPRAS.Service
 
             try
             {
-                if (notificationRequest.Tags.Length == 0)
+                if (notificationRequest.Tags.Count == 0)
                 {
                     // This will broadcast to all users registered in the notification hub
                     await SendPlatformNotificationsAsync(androidPayload, iOSPayload, token);
                 }
-                else if (notificationRequest.Tags.Length <= 20)
+                else if (notificationRequest.Tags.Count <= 20)
                 {
                     await SendPlatformNotificationsAsync(androidPayload, iOSPayload, notificationRequest.Tags, token);
                 }
@@ -126,7 +126,7 @@ namespace CHESF.COMPRAS.Service
 
                     await Task.WhenAll(notificationTasks);
                 }
-
+                _logger.LogInformation("Notificação enviada");
                 return true;
             }
             catch (Exception e)

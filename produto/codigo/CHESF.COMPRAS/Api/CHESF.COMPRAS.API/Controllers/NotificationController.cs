@@ -14,7 +14,7 @@ namespace CHESF.COMPRAS.API.Controllers
     {
         private readonly INotificationService _notificationService;
 
-        NotificationsController(INotificationService notificationService)
+        public NotificationsController(INotificationService notificationService)
         {
             _notificationService = notificationService;
         }

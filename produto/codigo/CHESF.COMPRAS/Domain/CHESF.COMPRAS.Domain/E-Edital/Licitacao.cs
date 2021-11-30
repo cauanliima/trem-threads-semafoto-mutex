@@ -39,9 +39,11 @@ namespace CHESF.COMPRAS.Domain.E_Edital
             get
             {
                 var c = Codigo.ToString();
-                int tamanho = c.Length;
-                return
-                    $"{c.Substring(0, tamanho - 4)}/{c.Substring(tamanho - 4)}";
+                if (c.Length <= 4) return c;
+                var resultado = c.Length >= 10
+                    ? $"{c.Substring(0, c.Length - 8)}.{c.Substring(c.Length - 8, 4)}.{c.Substring(c.Length - 4)}"
+                    : $"{c.Substring(0, c.Length - 4)}/{c.Substring(c.Length - 4)}";
+                return resultado;
             }
         }
     }

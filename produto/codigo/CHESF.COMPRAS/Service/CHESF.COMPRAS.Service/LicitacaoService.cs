@@ -41,16 +41,15 @@ namespace CHESF.COMPRAS.Service
         {
             var licitacoes = await _repository.GetAll();
 
-            if (filtro.situacao != null)
+            if (filtro.situacoes != null)
             {
-                licitacoes =
-                    licitacoes.Where(l => l.Status.ToUpper().Equals(filtro.situacao.ToUpper()));
+                licitacoes = licitacoes.Where(l => filtro.situacoes.Select(s => s.ToUpper()).Contains(l.Status.ToUpper()));
             }
 
-            if (filtro.modalidade != null)
+            if (filtro.modalidades != null)
             {
                 licitacoes =
-                    licitacoes.Where(l => l.Modalidade.ToUpper().Equals(filtro.modalidade.ToUpper()));
+                    licitacoes.Where(l => filtro.modalidades.Select(s => s.ToUpper()).Contains(l.Modalidade.ToUpper()));
             }
 
             if (filtro.inicio > DateTime.MinValue && filtro.fim > DateTime.MinValue)

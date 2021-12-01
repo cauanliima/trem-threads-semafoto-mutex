@@ -25,7 +25,7 @@
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "EEDITAL_CONNECTION": "Data Source=10.198.1.55;Initial Catalog=EEDITAL;User ID=deedital;Password=desv_dedit_10;MultipleActiveResultSets=True;"
+        "EEDITAL_CONNECTION": ""
       }
     }
   }

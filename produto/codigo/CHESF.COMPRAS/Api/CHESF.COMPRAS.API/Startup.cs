@@ -77,10 +77,6 @@ namespace CHESF.COMPRAS.API
                     ValidateAudience = false
                 };
             });
-            
-            services.AddOptions<NotificationHubOptions>()
-                .Configure(Configuration.GetSection("NotificationHub").Bind)
-                .ValidateDataAnnotations();
 
             #region DADOS DE CONTEXT E IoC
 
@@ -100,7 +96,7 @@ namespace CHESF.COMPRAS.API
             //Service
             services.AddTransient<ILicitacaoService, LicitacaoService>();
             services.AddTransient<IAnexoService, AnexoService>();
-            services.AddTransient<INotificationService, NotificationService>();
+            services.AddTransient<INotificationService, NotificationService>().AddOptions();
 
             #endregion
 

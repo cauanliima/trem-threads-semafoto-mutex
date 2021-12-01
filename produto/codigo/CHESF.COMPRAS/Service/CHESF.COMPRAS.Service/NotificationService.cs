@@ -11,18 +11,18 @@ using Microsoft.Extensions.Options;
 
 namespace CHESF.COMPRAS.Service
 {
-   public class NotificationService : INotificationService
+    public class NotificationService : INotificationService
     {
         readonly NotificationHubClient _hub;
         readonly Dictionary<string, NotificationPlatform> _installationPlatform;
         readonly ILogger<NotificationService> _logger;
 
-        public NotificationService(IOptions<NotificationHubOptions> options, ILogger<NotificationService> logger)
+        public NotificationService(ILogger<NotificationService> logger)
         {
             _logger = logger;
             _hub = NotificationHubClient.CreateClientFromConnectionString(
-                options.Value.ConnectionString,
-                options.Value.Name);
+                Environment.GetEnvironmentVariable("AZURE_NH_CONNECTION"),
+                Environment.GetEnvironmentVariable("AZURE_NH_NAME"));
 
             _installationPlatform = new Dictionary<string, NotificationPlatform>
             {
@@ -31,7 +31,8 @@ namespace CHESF.COMPRAS.Service
             };
         }
 
-        public async Task<bool> CreateOrUpdateInstallationAsync(DeviceInstallation deviceInstallation, CancellationToken token)
+        public async Task<bool> CreateOrUpdateInstallationAsync(DeviceInstallation deviceInstallation,
+            CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(deviceInstallation?.InstallationId) ||
                 string.IsNullOrWhiteSpace(deviceInstallation?.Platform) ||
@@ -79,22 +80,20 @@ namespace CHESF.COMPRAS.Service
             return true;
         }
 
-        public async Task<bool> RequestNotificationAsync(NotificationRequest notificationRequest, CancellationToken token)
+        public async Task<bool> RequestNotificationAsync(NotificationRequest notificationRequest,
+            CancellationToken token)
         {
             if ((notificationRequest.Silent &&
-                string.IsNullOrWhiteSpace(notificationRequest?.Action)) ||
+                 string.IsNullOrWhiteSpace(notificationRequest?.Action)) ||
                 (!notificationRequest.Silent &&
-                (string.IsNullOrWhiteSpace(notificationRequest?.Text)) ||
-                string.IsNullOrWhiteSpace(notificationRequest?.Action)))
+                 (string.IsNullOrWhiteSpace(notificationRequest?.Text)) ||
+                 string.IsNullOrWhiteSpace(notificationRequest?.Action)))
                 return false;
 
-            var androidPushTemplate = notificationRequest.Silent ?
-                PushTemplates.Silent.Android :
-                PushTemplates.Generic.Android;
+            var androidPushTemplate =
+                notificationRequest.Silent ? PushTemplates.Silent.Android : PushTemplates.Generic.Android;
 
-            var iOSPushTemplate = notificationRequest.Silent ?
-                PushTemplates.Silent.iOS :
-                PushTemplates.Generic.iOS;
+            var iOSPushTemplate = notificationRequest.Silent ? PushTemplates.Silent.iOS : PushTemplates.Generic.iOS;
 
             var androidPayload = PrepareNotificationPayload(
                 androidPushTemplate,
@@ -126,6 +125,7 @@ namespace CHESF.COMPRAS.Service
 
                     await Task.WhenAll(notificationTasks);
                 }
+
                 _logger.LogInformation("Notificação enviada");
                 return true;
             }
@@ -151,7 +151,8 @@ namespace CHESF.COMPRAS.Service
             return Task.WhenAll(sendTasks);
         }
 
-        Task SendPlatformNotificationsAsync(string androidPayload, string iOSPayload, IEnumerable<string> tags, CancellationToken token)
+        Task SendPlatformNotificationsAsync(string androidPayload, string iOSPayload, IEnumerable<string> tags,
+            CancellationToken token)
         {
             var sendTasks = new Task[]
             {

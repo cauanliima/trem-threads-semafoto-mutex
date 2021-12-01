@@ -10,10 +10,6 @@ Construir e empacotar DLLs (qualidade):
   before_script:
     - cd produto/codigo/CHESF.COMPRAS
     - dotnet restore
-    - cd Api/CHESF.COMPRAS.API
-    - dotnet user-secrets set "NotificationHub:Name" $LICITACHESF_NH_NAME
-    - dotnet user-secrets set "NotificationHub:ConnectionString" $LICITACHESF_NH_TOKEN
-    - cd ../../
   script: 
     - dotnet publish -c release -o ./Release --no-restore /p:Version="$(bash ./.ci/get-versao.sh 2>/dev/null)"
   artifacts: 
@@ -27,10 +23,6 @@ Construir e empacotar DLLs:
   before_script:
     - cd produto/codigo/CHESF.COMPRAS
     - dotnet restore
-    - cd Api/CHESF.COMPRAS.API
-    - dotnet user-secrets set "NotificationHub:Name" $LICITACHESF_NH_NAME
-    - dotnet user-secrets set "NotificationHub:ConnectionString" $LICITACHESF_NH_TOKEN
-    - cd ../../
   script: 
     - dotnet publish -c release -o ./Release --no-restore /p:Version="$CI_COMMIT_TAG"
   artifacts: 

@@ -98,12 +98,14 @@ namespace CHESF.COMPRAS.Service
             var androidPayload = PrepareNotificationPayload(
                 androidPushTemplate,
                 notificationRequest.Text,
-                notificationRequest.Action);
+                notificationRequest.Action,
+                notificationRequest.Tags);
 
             var iOSPayload = PrepareNotificationPayload(
                 iOSPushTemplate,
                 notificationRequest.Text,
-                notificationRequest.Action);
+                notificationRequest.Action,
+                notificationRequest.Tags);
 
             try
             {
@@ -136,7 +138,8 @@ namespace CHESF.COMPRAS.Service
             }
         }
 
-        string PrepareNotificationPayload(string template, string text, string action) => template
+        string PrepareNotificationPayload(string template, string text, string action, IList<string> tags) => template
+            .Replace("$(tags)", String.Join(",", tags), StringComparison.InvariantCulture)
             .Replace("$(alertMessage)", text, StringComparison.InvariantCulture)
             .Replace("$(alertAction)", action, StringComparison.InvariantCulture);
 

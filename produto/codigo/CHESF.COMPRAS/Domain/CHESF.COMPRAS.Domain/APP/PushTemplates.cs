@@ -5,10 +5,10 @@ namespace CHESF.COMPRAS.Domain.APP
         public class Generic
         {
             public const string Android =
-                "{ \"notification\": { \"title\" : \"PushDemo\", \"body\" : \"$(alertMessage)\"}, \"data\" : { \"action\" : \"$(alertAction)\" } }";
+                "{ \"notification\": { \"title\" : \"LicitaChesf\", \"body\" : \"$(alertMessage)\"}, \"data\" : { \"action\" : \"$(alertAction)\" } }";
 
             public const string iOS =
-                "{ \"aps\" : {\"alert\" : \"$(alertMessage)\"}, \"action\" : \"$(alertAction)\" }";
+                "{ \"aps\" : { \"title\" : \"LicitaChesf\"}, \"alert\" : \"$(alertMessage)\"}, \"action\" : \"$(alertAction)\" }";
         }
 
         public class Silent

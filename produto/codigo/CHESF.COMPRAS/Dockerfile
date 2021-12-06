@@ -1,6 +1,5 @@
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 
-ENV TZ=America/Sao_Paulo
 ENV ASPNETCORE_ENVIRONMENT=Production
 
 RUN apt-get update && apt-get install -y libgdiplus fontconfig fontconfig-config fonts-dejavu-core libbsd0 \

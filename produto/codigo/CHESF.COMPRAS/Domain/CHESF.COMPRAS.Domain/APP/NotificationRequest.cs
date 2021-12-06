@@ -1,16 +1,14 @@
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace CHESF.COMPRAS.Domain.APP
 {
     public class NotificationRequest
     {
-        public NotificationRequest()
-        {
-            Tags = new List<string>();
-        }
-        public string Text { get; set; }
+        public string Texto { get; set; }
+        public string NumeroLicitacao { get; set; }
+        public string CodigoLicitacao { get; set; }
         public string Action { get; set; }
-        public IList<string> Tags { get; set; }
         public bool Silent { get; set; }
     }
 }

@@ -86,7 +86,7 @@ namespace CHESF.COMPRAS.Service
             if ((notificationRequest.Silent &&
                  string.IsNullOrWhiteSpace(notificationRequest?.Action)) ||
                 (!notificationRequest.Silent &&
-                 (string.IsNullOrWhiteSpace(notificationRequest?.Text)) ||
+                 (string.IsNullOrWhiteSpace(notificationRequest?.Texto)) ||
                  string.IsNullOrWhiteSpace(notificationRequest?.Action)))
                 return false;
 
@@ -97,30 +97,32 @@ namespace CHESF.COMPRAS.Service
 
             var androidPayload = PrepareNotificationPayload(
                 androidPushTemplate,
-                notificationRequest.Text,
+                notificationRequest.Texto,
                 notificationRequest.Action,
-                notificationRequest.Tags);
+                notificationRequest.NumeroLicitacao);
 
             var iOSPayload = PrepareNotificationPayload(
                 iOSPushTemplate,
-                notificationRequest.Text,
+                notificationRequest.Texto,
                 notificationRequest.Action,
-                notificationRequest.Tags);
+                notificationRequest.NumeroLicitacao);
+
+            List<string> tags = new List<String> { notificationRequest.CodigoLicitacao };
 
             try
             {
-                if (notificationRequest.Tags.Count == 0)
+                if (tags.Count == 0)
                 {
                     // This will broadcast to all users registered in the notification hub
                     await SendPlatformNotificationsAsync(androidPayload, iOSPayload, token);
                 }
-                else if (notificationRequest.Tags.Count <= 20)
+                else if (tags.Count <= 20)
                 {
-                    await SendPlatformNotificationsAsync(androidPayload, iOSPayload, notificationRequest.Tags, token);
+                    await SendPlatformNotificationsAsync(androidPayload, iOSPayload, tags, token);
                 }
                 else
                 {
-                    var notificationTasks = notificationRequest.Tags
+                    var notificationTasks = tags
                         .Select((value, index) => (value, index))
                         .GroupBy(g => g.index / 20, i => i.value)
                         .Select(tags => SendPlatformNotificationsAsync(androidPayload, iOSPayload, tags, token));
@@ -138,8 +140,8 @@ namespace CHESF.COMPRAS.Service
             }
         }
 
-        string PrepareNotificationPayload(string template, string text, string action, IList<string> tags) => template
-            .Replace("$(tags)", String.Join(",", tags), StringComparison.InvariantCulture)
+        string PrepareNotificationPayload(string template, string text, string action, string licitacao) => template
+            .Replace("$(licitacao)", licitacao, StringComparison.InvariantCulture)
             .Replace("$(alertMessage)", text, StringComparison.InvariantCulture)
             .Replace("$(alertAction)", action, StringComparison.InvariantCulture);
 

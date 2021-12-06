@@ -18,15 +18,15 @@ namespace CHESF.COMPRAS.API.Controllers
         {
             _notificationService = notificationService;
         }
-        
-        
+
+
         [HttpPut]
         [Route("installations")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
         public async Task<IActionResult> UpdateInstallation(
-            [Required]DeviceInstallation deviceInstallation)
+            [Required] DeviceInstallation deviceInstallation)
         {
             var success = await _notificationService
                 .CreateOrUpdateInstallationAsync(deviceInstallation, HttpContext.RequestAborted);
@@ -43,7 +43,7 @@ namespace CHESF.COMPRAS.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
         public async Task<ActionResult> DeleteInstallation(
-            [Required][FromRoute]string installationId)
+            [Required] [FromRoute] string installationId)
         {
             var success = await _notificationService
                 .DeleteInstallationByIdAsync(installationId, CancellationToken.None);
@@ -60,12 +60,14 @@ namespace CHESF.COMPRAS.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
         public async Task<IActionResult> RequestPush(
-            [Required]NotificationRequest notificationRequest)
+            [Required] NotificationRequest notificationRequest)
         {
             if ((notificationRequest.Silent &&
                  string.IsNullOrWhiteSpace(notificationRequest?.Action)) ||
                 (!notificationRequest.Silent &&
-                 string.IsNullOrWhiteSpace(notificationRequest?.Text)))
+                 string.IsNullOrWhiteSpace(notificationRequest?.Texto)) ||
+                string.IsNullOrWhiteSpace(notificationRequest.CodigoLicitacao) ||
+                string.IsNullOrWhiteSpace(notificationRequest.NumeroLicitacao))
                 return new BadRequestResult();
 
             var success = await _notificationService
@@ -76,6 +78,5 @@ namespace CHESF.COMPRAS.API.Controllers
 
             return new OkResult();
         }
-        
     }
 }

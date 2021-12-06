@@ -5,19 +5,19 @@ namespace CHESF.COMPRAS.Domain.APP
         public class Generic
         {
             public const string Android =
-                "{ \"notification\": { \"title\" : \"LicitaChesf\", \"body\" : \"$(alertMessage)\"}, \"data\" : { \"action\" : \"$(alertAction)\", \"tags\" : \"$(tags)\" } }";
+                "{ \"notification\": { \"title\" : \"LicitaChesf\", \"body\" : \"$(alertMessage)\"}, \"data\" : { \"action\" : \"$(alertAction)\", \"licitacao\" : \"$(licitacao)\" } }";
 
             public const string iOS =
-                "{ \"aps\" : { \"title\" : \"LicitaChesf\"}, \"alert\" : \"$(alertMessage)\"}, \"action\" : \"$(alertAction)\", \"tags\" : \"$(tags)\" }";
+                "{ \"aps\" : { \"title\" : \"LicitaChesf\"}, \"alert\" : \"$(alertMessage)\"}, \"action\" : \"$(alertAction)\", \"licitacao\" : \"$(licitacao)\" }";
         }
 
         public class Silent
         {
             public const string Android =
-                "{ \"data\" : {\"message\" : \"$(alertMessage)\", \"action\" : \"$(alertAction)\", \"tags\" : \"$(tags)\"} }";
+                "{ \"data\" : {\"message\" : \"$(alertMessage)\", \"action\" : \"$(alertAction)\", \"licitacao\" : \"$(licitacao)\"} }";
 
             public const string iOS =
-                "{ \"aps\" : {\"content-available\" : 1, \"apns-priority\": 5, \"sound\" : \"\", \"badge\" : 0}, \"message\" : \"$(alertMessage)\", \"action\" : \"$(alertAction)\", , \"tags\" : \"$(tags)\" }";
+                "{ \"aps\" : {\"content-available\" : 1, \"apns-priority\": 5, \"sound\" : \"\", \"badge\" : 0}, \"message\" : \"$(alertMessage)\", \"action\" : \"$(alertAction)\", , \"licitacao\" : \"$(licitacao)\" }";
         }
     }
 }

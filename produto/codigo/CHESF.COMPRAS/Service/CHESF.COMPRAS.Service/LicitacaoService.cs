@@ -43,7 +43,8 @@ namespace CHESF.COMPRAS.Service
 
             if (filtro.situacoes != null)
             {
-                licitacoes = licitacoes.Where(l => filtro.situacoes.Select(s => s.ToUpper()).Contains(l.Status.ToUpper()));
+                licitacoes = licitacoes.Where(l =>
+                    filtro.situacoes.Select(s => s.ToUpper()).Contains(l.Status.ToUpper()));
             }
 
             if (filtro.modalidades != null)
@@ -61,9 +62,9 @@ namespace CHESF.COMPRAS.Service
 
             if (filtro.texto != null)
             {
-                licitacoes = licitacoes.Where(l =>
-                    l.Codigo.ToString().Contains(filtro.texto) ||
-                    l.Descricao.ToUpper().Contains(filtro.texto.ToUpper()));
+                licitacoes = licitacoes.ToList().Where(l =>
+                    l.Numero.ToString().Contains(filtro.texto) ||
+                    l.Descricao.ToUpper().Contains(filtro.texto.ToUpper())).AsQueryable();
             }
 
             return licitacoes.Skip(filtro.pagina * filtro.total).Take(filtro.total);

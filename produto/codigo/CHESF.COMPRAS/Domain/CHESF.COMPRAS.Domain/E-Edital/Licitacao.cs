@@ -41,7 +41,7 @@ namespace CHESF.COMPRAS.Domain.E_Edital
                 var c = Codigo.ToString();
                 if (c.Length <= 4) return c;
                 var resultado = c.Length >= 10
-                    ? $"{c.Substring(0, c.Length - 8)}.{c.Substring(c.Length - 8, 4)}.{c.Substring(c.Length - 4)}"
+                    ? $"{c.Substring(0, 2)}.{c.Substring(2, 4)}.{c.Substring(6, 4)}"
                     : $"{c.Substring(0, c.Length - 4)}/{c.Substring(c.Length - 4)}";
                 return resultado;
             }

@@ -39,8 +39,7 @@ namespace CHESF.COMPRAS.Service
 
         public async Task<IEnumerable<Licitacao>> Listar(LicitacaoFiltroQueryParams filtro)
         {
-            var licitacoes = await _repository.GetAll();
-
+            var licitacoes = _repository.GetTodasOrdenadas();
             if (filtro.situacoes != null)
             {
                 licitacoes = licitacoes.Where(l =>

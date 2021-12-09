@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -16,8 +17,9 @@ namespace CHESF.COMPRAS.Repository
         public LicitacaoRepository(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
         }
-        
-        public async Task<IList<Licitacao>> GetLicitacoesOrdenadas(Expression<Func<Licitacao, bool>> expression, int offset, int total)
+
+        public async Task<IList<Licitacao>> GetLicitacoesOrdenadas(Expression<Func<Licitacao, bool>> expression,
+            int offset, int total)
         {
             return await _entities.AsNoTracking()
                 .Where(expression)
@@ -27,5 +29,10 @@ namespace CHESF.COMPRAS.Repository
                 .ToListAsync();
         }
 
+        public IQueryable<Licitacao> GetTodasOrdenadas()
+        {
+            return _entities.AsNoTracking()
+                .OrderByDescending(t => t.AberturaPropostas);
+        }
     }
 }

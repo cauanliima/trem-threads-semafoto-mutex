@@ -16,6 +16,11 @@ namespace CHESF.COMPRAS.Service
             _repository = anexoRepository;
         }
 
+        public async Task<bool> Existe(long id)
+        {
+            return await _repository.Existe(arquivo => arquivo.Codigo == id);
+        }
+
         public async Task<IEnumerable<Anexo>> TodosDaLicitacao(long id)
         {
             return _repository.TodasDaLicitacao(id);

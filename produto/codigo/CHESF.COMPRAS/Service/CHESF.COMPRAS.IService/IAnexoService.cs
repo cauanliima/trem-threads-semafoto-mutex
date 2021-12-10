@@ -10,5 +10,6 @@ namespace CHESF.COMPRAS.IService
     {
         Task<IEnumerable<Anexo>> TodosDaLicitacao(long id);
         Task<ArquivoDTO> Baixar(int id);
+        Task<bool> Existe(long id);
     }
 }

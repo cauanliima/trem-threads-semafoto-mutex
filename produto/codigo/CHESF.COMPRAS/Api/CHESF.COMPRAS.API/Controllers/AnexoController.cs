@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CHESF.COMPRAS.API.Config.Security;
 using CHESF.COMPRAS.Domain.DTOs;
 using CHESF.COMPRAS.Domain.E_Edital;
 using CHESF.COMPRAS.IService;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.StaticFiles;
 namespace CHESF.COMPRAS.API.Controllers
 {
     [ApiController]
+    [ApiKey]
     [Route("anexos")]
     public class AnexoController : ControllerBase
     {
@@ -39,8 +41,10 @@ namespace CHESF.COMPRAS.API.Controllers
 
         [HttpGet]
         [Route("{id:int}/baixar")]
-        public async Task<FileResult> Baixar(int id)
+        public async Task<ActionResult > Baixar(int id)
         {
+            if (!(await _anexoService.Existe(id))) return NotFound();
+            
             var arquivo = await _anexoService.Baixar(id);
 
             string contentType;

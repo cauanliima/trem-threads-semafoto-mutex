@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using CHESF.COMPRAS.API.Config;
 using CHESF.COMPRAS.Domain.APP;
 using CHESF.COMPRAS.Repository.Context;
 using CHESF.COMPRAS.IRepository;
@@ -60,24 +62,6 @@ namespace CHESF.COMPRAS.API
             services.AddCors();
             services.AddHttpContextAccessor();
 
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.ASCII.GetBytes(Configuration.GetSection("Jwt").GetSection("Secret").Value)),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-            });
-
             #region DADOS DE CONTEXT E IoC
 
             services.AddDbContext<ComprasContext>(options => options
@@ -104,34 +88,33 @@ namespace CHESF.COMPRAS.API
 
             services.AddSwaggerGen(c =>
             {
+                const string securityDefinition = "ApiKey";
+
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "COMPRAS API", Version = "v1", Description = "Métodos da API do COMPRAS"
                 });
-
-                var jwtSecurityScheme = new OpenApiSecurityScheme
+                
+                c.AddSecurityDefinition(securityDefinition, new OpenApiSecurityScheme
                 {
-                    Scheme = "bearer",
-                    BearerFormat = "JWT",
-                    Name = "JWT Authentication",
                     In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.Http,
-                    Description = "Insira a chave JWT (sem o Bearer)",
-
-                    Reference = new OpenApiReference
-                    {
-                        Id = JwtBearerDefaults.AuthenticationScheme,
-                        Type = ReferenceType.SecurityScheme
-                    }
-                };
-
-                c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+                    Name = "X-API-KEY",
+                    Type = SecuritySchemeType.ApiKey
+                });
 
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
-                    { jwtSecurityScheme, Array.Empty<string>() }
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Name = "X-API-KEY",
+                            Type = SecuritySchemeType.ApiKey,
+                            In = ParameterLocation.Header,
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = securityDefinition }
+                        },
+                        new List<string>()
+                    }
                 });
-
 
                 var caminhoAplicacao =
                     PlatformServices.Default.Application.ApplicationBasePath;
@@ -168,6 +151,7 @@ namespace CHESF.COMPRAS.API
                 c.SwaggerEndpoint($"{basePath ?? ""}/swagger/v1/swagger.json", "COMPRAS-API v1");
                 c.RoutePrefix = "docs";
             });
+
 
             var supportedCultures = new[] { new CultureInfo("pt-BR") };
             app.UseRequestLocalization(new RequestLocalizationOptions

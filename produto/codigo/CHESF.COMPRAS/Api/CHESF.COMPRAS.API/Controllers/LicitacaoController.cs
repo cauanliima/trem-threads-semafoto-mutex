@@ -2,15 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CHESF.COMPRAS.API.Config.Security;
 using CHESF.COMPRAS.Domain.DTOs;
 using CHESF.COMPRAS.Domain.E_Edital;
 using CHESF.COMPRAS.Domain.QueryParams;
 using CHESF.COMPRAS.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CHESF.COMPRAS.API.Controllers
 {
     [ApiController]
+    [ApiKey]
     [Route("licitacoes")]
     public class LicitacaoController : ControllerBase
     {

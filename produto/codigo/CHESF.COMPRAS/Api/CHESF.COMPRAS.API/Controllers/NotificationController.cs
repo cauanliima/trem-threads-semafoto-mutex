@@ -2,13 +2,17 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using CHESF.COMPRAS.API.Config.Security;
 using CHESF.COMPRAS.Domain.APP;
 using CHESF.COMPRAS.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CHESF.COMPRAS.API.Controllers
 {
     [ApiController]
+    [Authorize]
+    [ApiKey]
     [Route("notificacoes")]
     public class NotificationsController : ControllerBase
     {

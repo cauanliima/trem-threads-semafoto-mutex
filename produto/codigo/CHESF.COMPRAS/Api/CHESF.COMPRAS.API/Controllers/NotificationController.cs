@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace CHESF.COMPRAS.API.Controllers
 {
     [ApiController]
-    [Authorize]
     [ApiKey]
     [Route("notificacoes")]
     public class NotificationsController : ControllerBase

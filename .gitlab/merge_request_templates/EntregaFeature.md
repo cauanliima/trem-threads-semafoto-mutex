@@ -10,5 +10,4 @@ _Descrição do porquê das alterações e o motivo desse merge request._
 _Você pode anexar imagens para mostrar o resultado, se for aplicavel._
 **Caso contrário, remova a seção "Amostra"**.
 
-/cc @felipekjr
 /cc @joilsonabrantes

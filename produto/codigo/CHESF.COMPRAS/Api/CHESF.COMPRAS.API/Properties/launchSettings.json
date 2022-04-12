@@ -25,7 +25,9 @@
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "EEDITAL_CONNECTION": ""
+        "API_KEY": "YsNCCO1rJUePGA7tLdPOlmpR9PMfU0Cd",
+        "EEDITAL_CONNECTION": "Data Source=10.128.1.109;Initial Catalog=EEDITAL;User ID=deedital;Password=ecrire*21;MultipleActiveResultSets=True;",
+        "SGNF_CONNECTION": "Data Source=10.198.1.55;Initial Catalog=SGNF;User ID=dsgnf;Password=sgnfdesv;MultipleActiveResultSets=True;"
       }
     }
   }

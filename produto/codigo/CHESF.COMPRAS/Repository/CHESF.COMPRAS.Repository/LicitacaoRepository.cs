@@ -14,7 +14,7 @@ namespace CHESF.COMPRAS.Repository
 {
     public class LicitacaoRepository : RepositoryBase<Licitacao>, ILicitacaoRepository
     {
-        public LicitacaoRepository(IUnitOfWork unitOfWork) : base(unitOfWork)
+        public LicitacaoRepository(IEComprasUnitOfWork unitOfWork) : base(unitOfWork)
         {
         }
 

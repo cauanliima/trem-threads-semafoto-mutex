@@ -8,4 +8,10 @@
       <ProjectReference Include="..\..\Domain\CHESF.COMPRAS.Domain\CHESF.COMPRAS.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.17.0" />
+      <PackageReference Include="System.ServiceModel.Http" Version="4.9.0" />
+      <PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
+    </ItemGroup>
+
 </Project>

@@ -4,14 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CHESF.COMPRAS.Domain.SGNF
 {
-    [Table("TB_CONTRATO_FORNECEDOR", Schema = "SGNF")]
+    [Table("TB_CONTRATO_FORNECEDOR")]
     public class ContratoFornecedor
     {
-        [Key] [Column("CD_CONTRATO_FORNECEDOR")] public long Codigo { get; set; }
+        [Key] [Column("CD_CONTRATO_FORNECEDOR")] public int Codigo { get; set; }
         
-        [Column("CD_CONTRATO")] public long IdContrato { get; set; }
+        [Column("CD_CONTRATO")] public int IdContrato { get; set; }
         
-        [Column("CD_FORNECEDOR")] public long IdFornecedor { get; set; }
+        [Column("CD_FORNECEDOR")] public int IdFornecedor { get; set; }
         
         [Column("DT_INICIO")] public DateTime? DataInicio { get; set; }
         

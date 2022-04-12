@@ -1,13 +1,12 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CHESF.COMPRAS.Domain.SGNF
 {
-    [Table("TB_FORNECEDOR", Schema = "SGNF")]
+    [Table("TB_FORNECEDOR")]
     public class Fornecedor 
     {
-        [Key] [Column("CD_FORNECEDOR")] public long Codigo { get; set; }
+        [Key] [Column("CD_FORNECEDOR")] public int Codigo { get; set; }
         
         [Column("NR_CNPJ")] public long CNPJ { get; set; }
         

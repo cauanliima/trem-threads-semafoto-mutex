@@ -2,10 +2,8 @@ using System;
 using System.Threading.Tasks;
 using CHESF.COMPRAS.Domain.DTOs;
 using CHESF.COMPRAS.IService;
-using CHESF.COMPRAS.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 
 namespace CHESF.COMPRAS.API.Controllers
 {
@@ -14,12 +12,12 @@ namespace CHESF.COMPRAS.API.Controllers
     [Route("auth")]
     public class AuthController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
         private readonly ILoginService _loginService;
+        private readonly ITokenService _tokenService;
 
-        public AuthController( IConfiguration configuration, ILoginService loginService)
+        public AuthController(ITokenService tokenService, ILoginService loginService)
         {
-            _configuration = configuration;
+            _tokenService = tokenService;
             _loginService = loginService;
         }
 
@@ -32,20 +30,19 @@ namespace CHESF.COMPRAS.API.Controllers
             {
                 if (!ModelState.IsValid) return BadRequest();
                 var usuarioRetornado = await _loginService.Autenticar(parametros.usuario, parametros.senha);
-                if(usuarioRetornado == null) return Unauthorized("As credenciais digitadas são inválidas");
-                
+                if (usuarioRetornado == null) return Unauthorized("As credenciais digitadas são inválidas");
+
                 return Ok(new
                 {
                     usuario = usuarioRetornado,
-                    token = TokenService.GenerateToken(usuarioRetornado)
+                    token = _tokenService.GenerateToken(usuarioRetornado)
                 });
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                return Problem(detail: ex.Message);
+                return Problem(ex.Message);
             }
         }
-
     }
 }

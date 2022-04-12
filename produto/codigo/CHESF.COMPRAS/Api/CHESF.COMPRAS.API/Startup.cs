@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using CHESF.COMPRAS.API.Middlewares;
 using CHESF.COMPRAS.IRepository;
 using CHESF.COMPRAS.IRepository.Base;
 using CHESF.COMPRAS.IRepository.UnitOfWork;
@@ -60,7 +59,7 @@ namespace CHESF.COMPRAS.API
 
             services.AddCors();
             services.AddHttpContextAccessor();
-            
+
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -72,7 +71,8 @@ namespace CHESF.COMPRAS.API
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("fedaf7d8863b48e197b9287d492b708e")),
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.ASCII.GetBytes(Configuration.GetSection("Jwt").GetSection("Secret").Value)),
                     ValidateIssuer = false,
                     ValidateAudience = false
                 };
@@ -83,7 +83,7 @@ namespace CHESF.COMPRAS.API
             services.AddDbContext<ComprasContext>(options => options
                 .UseSqlServer(Environment.GetEnvironmentVariable("EEDITAL_CONNECTION"))
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
-            
+
             services.AddDbContext<SGNFContext>(options => options
                 .UseSqlServer(Environment.GetEnvironmentVariable("SGNF_CONNECTION"))
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
@@ -97,11 +97,16 @@ namespace CHESF.COMPRAS.API
             //Repository
             services.AddTransient<ILicitacaoRepository, LicitacaoRepository>();
             services.AddTransient<IAnexoRepository, AnexoRepository>();
+            services.AddTransient<IContratoRepository, ContratoRepository>();
+            services.AddTransient<INotaFiscalRepository, NotaFiscalRepository>();
 
             //Service
+            services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<ILicitacaoService, LicitacaoService>();
             services.AddTransient<IAnexoService, AnexoService>();
             services.AddTransient<INotificationService, NotificationService>().AddOptions();
+            services.AddTransient<ILoginService, LoginService>();
+            services.AddTransient<IContratoService, ContratoService>();
 
             #endregion
 
@@ -115,7 +120,7 @@ namespace CHESF.COMPRAS.API
                 {
                     Title = "COMPRAS API", Version = "v1", Description = "Métodos da API do COMPRAS"
                 });
-                
+
                 c.AddSecurityDefinition(securityDefinition, new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
@@ -131,10 +136,34 @@ namespace CHESF.COMPRAS.API
                             Name = "X-API-KEY",
                             Type = SecuritySchemeType.ApiKey,
                             In = ParameterLocation.Header,
-                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = securityDefinition }
+                            Reference = new OpenApiReference
+                                { Type = ReferenceType.SecurityScheme, Id = securityDefinition }
                         },
                         new List<string>()
                     }
+                });
+
+                var jwtSecurityScheme = new OpenApiSecurityScheme
+                {
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Name = "JWT Authentication",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Description = "Insira a chave JWT (sem o Bearer)",
+
+                    Reference = new OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+
+                c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    { jwtSecurityScheme, Array.Empty<string>() }
                 });
 
                 var caminhoAplicacao =
@@ -156,7 +185,6 @@ namespace CHESF.COMPRAS.API
             app.UsePathBase(basePath);
             app.UseRouting();
             app.UseAuthentication();
-            app.UseMiddleware<JwtTokenMiddleware>();
             app.UseAuthorization();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             app.UseHttpsRedirection();

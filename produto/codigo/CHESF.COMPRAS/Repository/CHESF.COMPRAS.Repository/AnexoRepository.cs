@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using CHESF.COMPRAS.Domain.DTOs;
 using CHESF.COMPRAS.Domain.E_Edital;
 using CHESF.COMPRAS.IRepository;
 using CHESF.COMPRAS.IRepository.UnitOfWork;
@@ -12,7 +8,7 @@ namespace CHESF.COMPRAS.Repository
 {
     public class AnexoRepository : RepositoryBase<Anexo>, IAnexoRepository
     {
-        public AnexoRepository(IUnitOfWork unitOfWork) : base(unitOfWork)
+        public AnexoRepository(IEComprasUnitOfWork unitOfWork) : base(unitOfWork)
         {
         }
 

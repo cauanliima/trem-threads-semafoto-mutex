@@ -3,18 +3,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using CHESF.COMPRAS.API.Config;
-using CHESF.COMPRAS.Domain.APP;
-using CHESF.COMPRAS.Repository.Context;
+using CHESF.COMPRAS.API.Middlewares;
 using CHESF.COMPRAS.IRepository;
 using CHESF.COMPRAS.IRepository.Base;
 using CHESF.COMPRAS.IRepository.UnitOfWork;
 using CHESF.COMPRAS.IService;
 using CHESF.COMPRAS.Repository;
 using CHESF.COMPRAS.Repository.Base;
+using CHESF.COMPRAS.Repository.Context;
 using CHESF.COMPRAS.Repository.UnitOfWork;
 using CHESF.COMPRAS.Service;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
@@ -23,6 +21,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -61,14 +60,36 @@ namespace CHESF.COMPRAS.API
 
             services.AddCors();
             services.AddHttpContextAccessor();
+            
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("fedaf7d8863b48e197b9287d492b708e")),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
 
             #region DADOS DE CONTEXT E IoC
 
             services.AddDbContext<ComprasContext>(options => options
                 .UseSqlServer(Environment.GetEnvironmentVariable("EEDITAL_CONNECTION"))
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+            
+            services.AddDbContext<SGNFContext>(options => options
+                .UseSqlServer(Environment.GetEnvironmentVariable("SGNF_CONNECTION"))
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
-            services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
+            services.AddScoped(typeof(IEComprasUnitOfWork), typeof(EcomprasUnitOfWork));
+            services.AddScoped(typeof(ISGNFUnitOfWork), typeof(SGNFUnitOfWork));
 
             services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
 
@@ -135,6 +156,7 @@ namespace CHESF.COMPRAS.API
             app.UsePathBase(basePath);
             app.UseRouting();
             app.UseAuthentication();
+            app.UseMiddleware<JwtTokenMiddleware>();
             app.UseAuthorization();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             app.UseHttpsRedirection();

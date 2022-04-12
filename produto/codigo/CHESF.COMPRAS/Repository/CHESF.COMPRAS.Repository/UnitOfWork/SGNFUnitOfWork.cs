@@ -1,14 +1,14 @@
-using CHESF.COMPRAS.Repository.Context;
 using CHESF.COMPRAS.IRepository.UnitOfWork;
+using CHESF.COMPRAS.Repository.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace CHESF.COMPRAS.Repository.UnitOfWork
 {
-    public class UnitOfWork : IUnitOfWork
+    public class SGNFUnitOfWork : ISGNFUnitOfWork
     {
         public DbContext Context { get; }
 
-        public UnitOfWork(ComprasContext context)
+        public SGNFUnitOfWork(SGNFContext context)
         {
             Context = context;
         }

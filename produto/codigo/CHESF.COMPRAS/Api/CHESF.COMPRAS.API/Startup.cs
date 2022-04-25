@@ -97,7 +97,9 @@ namespace CHESF.COMPRAS.API
             //Repository
             services.AddTransient<ILicitacaoRepository, LicitacaoRepository>();
             services.AddTransient<IAnexoRepository, AnexoRepository>();
+            services.AddTransient<IUsuarioRepository, UsuarioRepository>();
             services.AddTransient<IContratoRepository, ContratoRepository>();
+            services.AddTransient<IContratoFonecedorRepository, ContratoFornecedorRepository>();
             services.AddTransient<INotaFiscalRepository, NotaFiscalRepository>();
 
             //Service

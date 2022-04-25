@@ -9,6 +9,5 @@ namespace CHESF.COMPRAS.Domain.DTOs
         public string? Cnpj { get; set; }
         public string? Login { get; set; }
         public List<PerfilDTO> Perfis { get; set; }
-        
     }
 }

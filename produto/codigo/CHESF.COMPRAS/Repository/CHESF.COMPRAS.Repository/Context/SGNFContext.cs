@@ -28,6 +28,7 @@ namespace CHESF.COMPRAS.Repository.Context
             modelBuilder.Entity<ContratoFornecedor>();
             modelBuilder.Entity<NotaFiscal>();
             modelBuilder.Entity<StatusNotaFiscal>();
+            modelBuilder.Entity<Usuario>();
 
             base.OnModelCreating(modelBuilder);
         }

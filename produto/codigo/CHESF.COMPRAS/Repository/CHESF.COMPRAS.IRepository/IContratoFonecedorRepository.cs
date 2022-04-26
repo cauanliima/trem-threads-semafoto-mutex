@@ -3,7 +3,7 @@ using CHESF.COMPRAS.IRepository.Base;
 
 namespace CHESF.COMPRAS.IRepository
 {
-    public interface IContratoRepository : IRepositoryBase<Contrato>
+    public interface IContratoFonecedorRepository : IRepositoryBase<ContratoFornecedor>
     {
     }
 }

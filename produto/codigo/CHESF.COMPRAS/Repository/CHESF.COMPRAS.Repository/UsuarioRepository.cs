@@ -5,9 +5,9 @@ using CHESF.COMPRAS.Repository.Base;
 
 namespace CHESF.COMPRAS.Repository
 {
-    public class ContratoRepository : RepositoryBase<Contrato>, IContratoRepository
+    public class UsuarioRepository : RepositoryBase<Usuario>, IUsuarioRepository
     {
-        public ContratoRepository(ISGNFUnitOfWork unitOfWork) : base(unitOfWork)
+        public UsuarioRepository(ISGNFUnitOfWork unitOfWork) : base(unitOfWork)
         {
         }
     }

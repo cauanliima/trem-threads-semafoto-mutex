@@ -23,10 +23,18 @@ namespace CHESF.COMPRAS.Domain.SGNF
         
         [Column("NR_ANO")] public int? Ano { get; set; }
         
+        [Column("CD_ADMINISTRADOR")]
+        public int? IdAdministrador { get; set; }
+        
         [Column("DT_EMISSAO")] public DateTime? DataEmissao { get; set; }
        
         [JsonIgnore]
-        [Column("CD_NOTA_FISCAL_STATUS_NOTA")] public int? IdStatus { get; set; }
+        [Column("CD_NOTA_FISCAL_STATUS_NOTA")]
+        public int? IdStatus { get; set; }
+        
+        [JsonIgnore]
+        [ForeignKey("IdContrato")]
+        public virtual Contrato? Contrato { get; set; }
         
         [JsonIgnore]
         [ForeignKey("IdStatus")]

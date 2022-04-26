@@ -14,17 +14,23 @@ namespace CHESF.COMPRAS.Domain.SGNF
         
         [Column("NR_CONTRATO")] public string Numero { get; set; }
         
-        [Column("VL_CONTRATO")] public double Valor { get; set; }
+        [Column("VL_CONTRATO")] public double? Valor { get; set; }
         
-        [Column("DS_OBJETO")] public string Objeto { get; set; }
+        [Column("DS_OBJETO")] public string? Objeto { get; set; }
         
-        [Column("NR_CONTRATO_SAP")] public string NumeroContratoSAP { get; set; }
+        [Column("NR_CONTRATO_SAP")] public string? NumeroContratoSAP { get; set; }
         
         [Column("IC_ATIVO")] public bool Ativo { get; set; }
         
-        [Column("DT_INCLUSAO")] public DateTime?  DataInclusao { get; set; }
+        [Column("DT_INCLUSAO")] public DateTime  DataInclusao { get; set; }
         
         [JsonIgnore]
         public virtual ICollection<ContratoFornecedor> ContratoFornecedores { get; set; }
+        
+        [JsonIgnore]
+        public virtual ICollection<NotaFiscal>? NotasFiscais { get; set; }
+        
+        [NotMapped]
+        public Usuario? Administrador { get; set; }
     }
 }

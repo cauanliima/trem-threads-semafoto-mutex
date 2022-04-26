@@ -1,9 +1,10 @@
 using System.Threading.Tasks;
+using CHESF.COMPRAS.Domain.DTOs;
 
 namespace CHESF.COMPRAS.IService
 {
     public interface ILoginService
     {
-        Task<dynamic> Autenticar(string usuario, string senha);
+        Task<UsuarioDTO?> Autenticar(string usuario, string senha);
     }
 }

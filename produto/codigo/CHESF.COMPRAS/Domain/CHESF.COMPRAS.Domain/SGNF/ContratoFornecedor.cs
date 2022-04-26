@@ -21,17 +21,17 @@ namespace CHESF.COMPRAS.Domain.SGNF
         
         [Column("DT_FIM_SERVICO")] public DateTime? DataFimServico { get; set; }
         
-        [Column("NR_DIAS_PAGAMENTO")] public int NumeroDiasPagamentos { get; set; }
+        [Column("NR_DIAS_PAGAMENTO")] public int? NumeroDiasPagamentos { get; set; }
         
-        [Column("VL_PAGO")] public double ValorPago { get; set; }
+        [Column("VL_PAGO")] public double? ValorPago { get; set; }
         
-        [Column("VL_PREVISTO")] public double ValorPrevisto { get; set; }
+        [Column("VL_PREVISTO")] public double? ValorPrevisto { get; set; }
         
-        [Column("VL_REALIZADO")] public double ValorRealizado { get; set; }
+        [Column("VL_REALIZADO")] public double? ValorRealizado { get; set; }
         
-        [ForeignKey("IdContrato")] public virtual Contrato? Contrato { get; set; }
+        [ForeignKey("IdContrato")] public virtual Contrato Contrato { get; set; }
         
-        [ForeignKey("IdFornecedor")] public virtual Fornecedor? Fornecedor { get; set; }
+        [ForeignKey("IdFornecedor")] public virtual Fornecedor Fornecedor { get; set; }
         
     }
 }

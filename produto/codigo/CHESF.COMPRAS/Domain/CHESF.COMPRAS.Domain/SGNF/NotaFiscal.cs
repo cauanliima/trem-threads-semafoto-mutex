@@ -27,6 +27,8 @@ namespace CHESF.COMPRAS.Domain.SGNF
         public int? IdAdministrador { get; set; }
         
         [Column("DT_EMISSAO")] public DateTime? DataEmissao { get; set; }
+        
+        [Column("DT_INCLUSAO")] public DateTime? DataInclusao { get; set; }
        
         [JsonIgnore]
         [Column("CD_NOTA_FISCAL_STATUS_NOTA")]

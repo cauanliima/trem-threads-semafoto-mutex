@@ -14,6 +14,6 @@ namespace CHESF.COMPRAS.IRepository
         Task<IList<Licitacao>> GetLicitacoesOrdenadas(Expression<Func<Licitacao, bool>> expression, int offset,
             int total);
         
-        IQueryable<Licitacao> GetTodasOrdenadas();
+        IQueryable<Licitacao> GetTodasValidasOrdenadas();
     }
 }

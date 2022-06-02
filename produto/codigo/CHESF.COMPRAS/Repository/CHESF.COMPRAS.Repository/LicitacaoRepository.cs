@@ -29,10 +29,14 @@ namespace CHESF.COMPRAS.Repository
                 .ToListAsync();
         }
 
-        public IQueryable<Licitacao> GetTodasOrdenadas()
+        public IQueryable<Licitacao> GetTodasValidasOrdenadas()
         {
+            List<string> situacoes = new List<string>();
+            situacoes.Add("PU");
+            situacoes.Add("EX");
             return _entities.AsNoTracking()
-                .OrderByDescending(t => t.AberturaPropostas);
+                .Where(l => situacoes.Select(s => s.ToUpper()).Contains(l.Status.ToUpper()))
+                .OrderByDescending(l => l.AberturaPropostas);
         }
     }
 }

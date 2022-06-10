@@ -13,9 +13,9 @@ namespace CHESF.COMPRAS.Domain.SGNF
         
         [Column("CD_FORNECEDOR")] public int IdFornecedor { get; set; }
         
-        [Column("DT_INICIO")] public DateTime? DataInicio { get; set; }
+        [Column("DT_INICIO_SERVICO")] public DateTime? DataInicio { get; set; }
         
-        [Column("DT_FIM")] public DateTime? DataFim { get; set; }
+        [Column("DT_FIM_SERVICO")] public DateTime? DataFim { get; set; }
         
         [Column("DT_INICIO_SERVICO")] public DateTime? DataInicioServico { get; set; }
         

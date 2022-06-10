@@ -41,11 +41,11 @@ namespace CHESF.COMPRAS.Service
             var contratos = await (await _contratoFornecedorRepository.GetAll())
                 .Where(
                     contratoFornecedor => contratoFornecedor.Fornecedor!.CNPJ == cnpj
-                    && contratoFornecedor.DataInicio != null
-                    && contratoFornecedor.DataInicio <= agora
+                    && (contratoFornecedor.DataInicio == null || contratoFornecedor.DataInicio <= agora)
                     && (contratoFornecedor.DataFim == null || contratoFornecedor.DataFim!.Value.AddDays(90) >= agora)
+                    && !(contratoFornecedor.DataInicio == null && contratoFornecedor.DataFim == null)
                 )
-                .OrderBy(contratoFornecedor => contratoFornecedor.DataInicio)
+                .OrderBy(contratoFornecedor => contratoFornecedor.Contrato.Numero)
                 .Include(contratoFornecedor => contratoFornecedor.Contrato)
                 .ThenInclude(contrato => contrato.NotasFiscais)
                 .Select(contratoFornecedor => contratoFornecedor.Contrato)

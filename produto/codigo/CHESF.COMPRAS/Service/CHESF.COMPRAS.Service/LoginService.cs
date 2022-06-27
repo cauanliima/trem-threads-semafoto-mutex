@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
@@ -13,10 +14,13 @@ namespace CHESF.COMPRAS.Service
         public async Task<UsuarioDTO?> Autenticar(string usuario, string senha)
         {
             var wsf = new ServicoFornecedoresClient();
-            const string webService = "http://recdapl1.redechesf.local/aplic/fornecedores.nsf/fornecedores?wsdl";
-            var ambiente = "DESENVOLVIMENTO";
+            string webService = "http://recpabv1/aplic/fornecedores.nsf/Fornecedores?WSDL";
+            var ambiente = Environment.GetEnvironmentVariable("MODO_EXECUCAO_SISTEMA") ;
+            if (ambiente == "DESENVOLVIMENTO")
+            {
+                webService = "http://recdapl1.redechesf.local/aplic/fornecedores.nsf/fornecedores?wsdl";
+            }
             wsf.Endpoint.Address = new EndpointAddress(webService);
-
             if (ambiente != "DESENVOLVIMENTO")
             {
                 var validarLogin = await wsf.AutenticaAsync(usuario, senha);

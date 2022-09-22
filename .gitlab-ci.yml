@@ -8,26 +8,24 @@ stages:
 Construir e empacotar DLLs (qualidade):
   stage: Compilação
   before_script:
-    - cd produto/codigo/CHESF.COMPRAS
     - dotnet restore
   script: 
     - dotnet publish -c release -o ./Release --no-restore /p:Version="$(bash ./.ci/get-versao.sh 2>/dev/null)"
   artifacts: 
     paths:
-      - produto/codigo/CHESF.COMPRAS/Release/
+      - Release/
   except:
     - tags
 
 Construir e empacotar DLLs:
   stage: Compilação
   before_script:
-    - cd produto/codigo/CHESF.COMPRAS
     - dotnet restore
   script: 
     - dotnet publish -c release -o ./Release --no-restore /p:Version="$CI_COMMIT_TAG"
   artifacts: 
     paths:
-      - produto/codigo/CHESF.COMPRAS/Release/
+      - Release/
   only:
     - tags
 
@@ -36,8 +34,6 @@ Dockerizar versão mais recente:
   services:
     - docker:dind
   stage: Dockerização
-  before_script:
-    - cd produto/codigo/CHESF.COMPRAS
   script:
     - docker build -t harbor.chesf.gov.br/dgcds/compras:dev .
     - docker login -u $HARBOR_USER -p $HARBOR_PASSWORD harbor.chesf.gov.br
@@ -52,8 +48,6 @@ Dockerizar tag:
   stage: Dockerização
   services:
     - docker:dind
-  before_script:
-    - cd produto/codigo/CHESF.COMPRAS
   script:
     - docker build -t harbor.chesf.gov.br/dgcds/compras:$CI_COMMIT_TAG .
     - docker login -u $HARBOR_USER -p $HARBOR_PASSWORD harbor.chesf.gov.br
@@ -64,16 +58,11 @@ Dockerizar tag:
     - Construir e empacotar DLLs
 
 Implantar aplicação no Rancher:
-  image: ubuntu
+  image: logapenvironment/rancher
   stage: Implantação
   environment:
     name: qualidade
   script:
-    - apt-get update && apt-get install -y curl
-    - curl -LJO https://github.com/rancher/cli/releases/download/v2.4.6/rancher-linux-amd64-v2.4.6.tar.gz && tar -xvf rancher-linux-amd64-v2.4.6.tar.gz && mv rancher-v2.4.6/rancher /usr/local/bin/rancher
-    - mkdir ~/.rancher/ && chmod -R a+rw ~/.rancher/
-    - curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-    - chmod +x kubectl && mv kubectl /usr/local/bin/kubectl
     - rancher login $RANCHER_API_URL --token $RANCHER_BEARER_TOKEN --context $RANCHER_PROJECT_ID
     - rancher context switch DGCDS
     - rancher kubectl rollout restart deployment/compras-dev --namespace compras

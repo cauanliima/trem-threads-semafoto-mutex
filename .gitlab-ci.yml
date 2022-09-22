@@ -64,7 +64,6 @@ Implantar aplicação no Rancher:
     name: qualidade
   script:
     - rancher login $RANCHER_API_URL --token $RANCHER_BEARER_TOKEN --context $RANCHER_PROJECT_ID
-    - rancher context switch DGCDS
     - rancher kubectl rollout restart deployment/compras-dev --namespace compras
   only:
     - develop

@@ -12,6 +12,8 @@ using CHESF.COMPRAS.Repository.Base;
 using CHESF.COMPRAS.Repository.Context;
 using CHESF.COMPRAS.Repository.UnitOfWork;
 using CHESF.COMPRAS.Service;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
@@ -79,6 +81,17 @@ namespace CHESF.COMPRAS.API
             });
 
             #region DADOS DE CONTEXT E IoC
+            string? base64FirebaseKey = Environment.GetEnvironmentVariable("BASE64_FIREBASE_KEY");
+
+            if (base64FirebaseKey != null)
+            {
+                var keyBytes = Convert.FromBase64String(base64FirebaseKey);
+                FirebaseApp.Create(new AppOptions()
+                {
+                    Credential = GoogleCredential.FromStream(new MemoryStream(keyBytes))
+                });
+            }
+
 
             services.AddDbContext<ComprasContext>(options => options
                 .UseSqlServer(Environment.GetEnvironmentVariable("EEDITAL_CONNECTION"))
@@ -93,7 +106,6 @@ namespace CHESF.COMPRAS.API
 
             services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
 
-
             //Repository
             services.AddTransient<ILicitacaoRepository, LicitacaoRepository>();
             services.AddTransient<IAnexoRepository, AnexoRepository>();
@@ -101,6 +113,8 @@ namespace CHESF.COMPRAS.API
             services.AddTransient<IContratoRepository, ContratoRepository>();
             services.AddTransient<IContratoFonecedorRepository, ContratoFornecedorRepository>();
             services.AddTransient<INotaFiscalRepository, NotaFiscalRepository>();
+            services.AddTransient<IDispositivoRepository, DispositivoRepository>();
+            services.AddTransient<IDispositivoMetadadoRepository, DispositivoMetadadoRepository>();
 
             //Service
             services.AddTransient<ITokenService, TokenService>();

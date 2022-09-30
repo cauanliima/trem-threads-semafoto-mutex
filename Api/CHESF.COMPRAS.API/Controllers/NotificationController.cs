@@ -1,11 +1,13 @@
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using CHESF.COMPRAS.API.Config.Security;
 using CHESF.COMPRAS.Domain.APP;
+using CHESF.COMPRAS.Domain.DTOs;
 using CHESF.COMPRAS.IService;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CHESF.COMPRAS.API.Controllers
@@ -22,46 +24,36 @@ namespace CHESF.COMPRAS.API.Controllers
             _notificationService = notificationService;
         }
 
-
         [HttpPut]
-        [Route("installations")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
-        public async Task<IActionResult> UpdateInstallation(
-            [Required] DeviceInstallation deviceInstallation)
+        [Route("dispositivo")]
+        public async Task<IActionResult> AtualizarRegistroDispositivo([FromBody] DispositivoDTO dispositivo)
         {
-            var success = await _notificationService
-                .CreateOrUpdateInstallationAsync(deviceInstallation, HttpContext.RequestAborted);
+            var success = await _notificationService.AtualizarRegistroDispositivoAsync(dispositivo, default);
 
             if (!success)
-                return new UnprocessableEntityResult();
+            {
+                return BadRequest();
+            }
 
-            return new OkResult();
+            return Ok();
         }
 
-        [HttpDelete()]
-        [Route("installations/{installationId}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
-        public async Task<ActionResult> DeleteInstallation(
-            [Required] [FromRoute] string installationId)
+        [HttpPost]
+        [Route("notificar")]
+        public async Task<IActionResult> Notificar([FromBody] NotificarDTO dto)
         {
-            var success = await _notificationService
-                .DeleteInstallationByIdAsync(installationId, CancellationToken.None);
+            var success = await _notificationService.NotificarAsync(dto);
 
             if (!success)
-                return new UnprocessableEntityResult();
-
-            return new OkResult();
+            {
+                return BadRequest();
+            }
+            
+            return Ok();
         }
 
         [HttpPost]
         [Route("requests")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
         public async Task<IActionResult> RequestPush(
             [Required] NotificationRequest notificationRequest)
         {

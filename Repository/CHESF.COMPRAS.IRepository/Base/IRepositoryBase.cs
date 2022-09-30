@@ -26,6 +26,7 @@ namespace CHESF.COMPRAS.IRepository.Base
         void Detach(T entity);
         void DetachAll();
         void ClearEntities();
+        Task SaveChanges();
         Task<bool> Delete(T entity);
     }
 }

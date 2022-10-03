@@ -1,13 +1,16 @@
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CHESF.COMPRAS.Domain.APP;
+using CHESF.COMPRAS.Domain.DTOs;
 
 namespace CHESF.COMPRAS.IService
 {
     public interface INotificationService
     {
-        Task<bool> CreateOrUpdateInstallationAsync(DeviceInstallation deviceInstallation, CancellationToken token);
-        Task<bool> DeleteInstallationByIdAsync(string installationId, CancellationToken token);
+        Task<bool> AtualizarRegistroDispositivoAsync(DispositivoDTO dispositivo, CancellationToken token);
+        Task<bool> NotificarAsync(NotificarDTO dto);
         Task<bool> RequestNotificationAsync(NotificationRequest notificationRequest, CancellationToken token);
     }
 }

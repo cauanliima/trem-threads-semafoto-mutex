@@ -178,5 +178,10 @@ namespace CHESF.COMPRAS.Repository.Base
             _entities.Remove(entity);
             return true;
         }
+
+        public async Task SaveChanges()
+        {
+            await UnitOfWork.Context.SaveChangesAsync();
+        }
     }
 }

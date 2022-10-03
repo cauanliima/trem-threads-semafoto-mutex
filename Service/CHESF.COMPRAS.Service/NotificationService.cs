@@ -4,78 +4,110 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CHESF.COMPRAS.Domain.APP;
+using CHESF.COMPRAS.Domain.DTOs;
+using CHESF.COMPRAS.Domain.E_Edital;
+using CHESF.COMPRAS.IRepository;
 using CHESF.COMPRAS.IService;
-using Microsoft.Azure.NotificationHubs;
+using FirebaseAdmin.Messaging;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace CHESF.COMPRAS.Service
 {
     public class NotificationService : INotificationService
     {
-        readonly NotificationHubClient _hub;
-        readonly Dictionary<string, NotificationPlatform> _installationPlatform;
         readonly ILogger<NotificationService> _logger;
+        private readonly IDispositivoRepository _dispositivoRepository;
+        private readonly IDispositivoMetadadoRepository _dispositivoMetadadoRepository;
 
-        public NotificationService(ILogger<NotificationService> logger)
+        public NotificationService(
+            ILogger<NotificationService> logger,
+            IDispositivoRepository dispositivoRepository,
+            IDispositivoMetadadoRepository dispositivoMetadadoRepository
+        )
         {
             _logger = logger;
-            _hub = NotificationHubClient.CreateClientFromConnectionString(
-                Environment.GetEnvironmentVariable("AZURE_NH_CONNECTION"),
-                Environment.GetEnvironmentVariable("AZURE_NH_NAME"));
-
-            _installationPlatform = new Dictionary<string, NotificationPlatform>
-            {
-                { nameof(NotificationPlatform.Apns).ToLower(), NotificationPlatform.Apns },
-                { nameof(NotificationPlatform.Fcm).ToLower(), NotificationPlatform.Fcm }
-            };
+            _dispositivoRepository = dispositivoRepository;
+            _dispositivoMetadadoRepository = dispositivoMetadadoRepository;
         }
 
-        public async Task<bool> CreateOrUpdateInstallationAsync(DeviceInstallation deviceInstallation,
-            CancellationToken token)
+        public async Task<bool> AtualizarRegistroDispositivoAsync(DispositivoDTO dto, CancellationToken token)
         {
-            if (string.IsNullOrWhiteSpace(deviceInstallation?.InstallationId) ||
-                string.IsNullOrWhiteSpace(deviceInstallation?.Platform) ||
-                string.IsNullOrWhiteSpace(deviceInstallation?.PushChannel))
-                return false;
+            var query = from dispositivoBanco in (await _dispositivoRepository.GetAll())
+                where dispositivoBanco.UidFirebaseInstallation == dto.FirebaseId
+                select dispositivoBanco;
 
-            var installation = new Installation()
+            var dispositivo = query.FirstOrDefault();
+
+            if (dispositivo == null)
             {
-                InstallationId = deviceInstallation.InstallationId,
-                PushChannel = deviceInstallation.PushChannel,
-                Tags = deviceInstallation.Tags
-            };
-
-            if (_installationPlatform.TryGetValue(deviceInstallation.Platform, out var platform))
-                installation.Platform = platform;
+                dispositivo = await _dispositivoRepository.Insert(new Dispositivo
+                {
+                    UidFirebaseInstallation = dto.FirebaseId,
+                    CnpjVinculado = dto.Cnpj,
+                    DataAtualizacaoFcmToken = DateTime.UtcNow,
+                    FcmToken = dto.FcmToken
+                });
+            }
             else
-                return false;
+            {
+                dispositivo.FcmToken = dto.FcmToken;
+                dispositivo.CnpjVinculado = dto.Cnpj;
+                dispositivo.DataAtualizacaoFcmToken = DateTime.UtcNow;
 
-            try
-            {
-                await _hub.CreateOrUpdateInstallationAsync(installation, token);
+                await _dispositivoRepository.Update(dispositivo);
             }
-            catch
-            {
-                return false;
-            }
+
+            await _dispositivoRepository.SaveChanges();
+
+            await AtualizarMetadadosAsync(dispositivo, dto.Metadados, token);
+
+            _dispositivoRepository.DetachAll();
 
             return true;
         }
 
-        public async Task<bool> DeleteInstallationByIdAsync(string installationId, CancellationToken token)
+        private async Task<bool> AtualizarMetadadosAsync(Dispositivo dispositivo, Dictionary<string, string> metadados,
+            CancellationToken token)
         {
-            if (string.IsNullOrWhiteSpace(installationId))
-                return false;
+            var metadadosEmBanco = await (from metadado in await _dispositivoMetadadoRepository.GetAll()
+                where metadado.IdDispositivo == dispositivo.Id
+                select metadado).ToListAsync(cancellationToken: token);
 
-            try
+            foreach (var metadado in metadadosEmBanco)
             {
-                await _hub.DeleteInstallationAsync(installationId, token);
+                await _dispositivoMetadadoRepository.Delete(metadado);
             }
-            catch
+
+            await _dispositivoMetadadoRepository.SaveChanges();
+            _dispositivoMetadadoRepository.DetachAll();
+
+            foreach (var (identificador, valor) in metadados)
             {
-                return false;
+                if (identificador.StartsWith("LISTA:"))
+                {
+                    foreach (var valorUnico in valor.Split(";"))
+                    {
+                        await _dispositivoMetadadoRepository.Insert(new DispositivoMetadado
+                        {
+                            IdDispositivo = dispositivo.Id,
+                            Identificador = identificador,
+                            Valor = valorUnico
+                        });
+                    }
+                }
+                else
+                {
+                    await _dispositivoMetadadoRepository.Insert(new DispositivoMetadado
+                    {
+                        IdDispositivo = dispositivo.Id,
+                        Identificador = identificador,
+                        Valor = valor
+                    });
+                }
             }
+
+            await _dispositivoMetadadoRepository.SaveChanges();
 
             return true;
         }
@@ -83,89 +115,71 @@ namespace CHESF.COMPRAS.Service
         public async Task<bool> RequestNotificationAsync(NotificationRequest notificationRequest,
             CancellationToken token)
         {
-            if ((notificationRequest.Silent &&
-                 string.IsNullOrWhiteSpace(notificationRequest?.Action)) ||
-                (!notificationRequest.Silent &&
-                 (string.IsNullOrWhiteSpace(notificationRequest?.Texto)) ||
-                 string.IsNullOrWhiteSpace(notificationRequest?.Action)))
-                return false;
+            var metadados = new Dictionary<string, string>();
+            var payload = new Dictionary<string, string>();
 
-            var androidPushTemplate =
-                notificationRequest.Silent ? PushTemplates.Silent.Android : PushTemplates.Generic.Android;
-
-            var iOSPushTemplate = notificationRequest.Silent ? PushTemplates.Silent.iOS : PushTemplates.Generic.iOS;
-
-            var androidPayload = PrepareNotificationPayload(
-                androidPushTemplate,
-                notificationRequest.Texto,
-                notificationRequest.Action,
-                notificationRequest.NumeroLicitacao);
-
-            var iOSPayload = PrepareNotificationPayload(
-                iOSPushTemplate,
-                notificationRequest.Texto,
-                notificationRequest.Action,
-                notificationRequest.NumeroLicitacao);
-
-            List<string> tags = new List<String> { notificationRequest.CodigoLicitacao };
-
-            try
+            metadados.Add("LISTA:LICITACOES_FAVORITAS", notificationRequest.CodigoLicitacao);
+            payload.Add("codigoLicitacao", notificationRequest.CodigoLicitacao);
+           
+            return await NotificarAsync(new NotificarDTO
             {
-                if (tags.Count == 0)
+                Titulo = null,
+                Tipo = "ANEXO_LICITACAO",
+                Texto = notificationRequest.Texto,
+                Cnpj = null,
+                Metadados = metadados,
+                Payload = payload
+            });
+        }
+
+        public async Task<bool> NotificarAsync(NotificarDTO dto)
+        {
+            var query = from dispositivoBanco in await _dispositivoRepository.GetAll() select dispositivoBanco;
+
+            if (dto.Cnpj != null)
+            {
+                query = from dispositivoBanco in query
+                    where dispositivoBanco.CnpjVinculado == dto.Cnpj
+                    select dispositivoBanco;
+            }
+
+            foreach (var (identificador, valor) in dto.Metadados)
+            {
+                if (identificador.StartsWith("LISTA:"))
                 {
-                    // This will broadcast to all users registered in the notification hub
-                    await SendPlatformNotificationsAsync(androidPayload, iOSPayload, token);
-                }
-                else if (tags.Count <= 20)
-                {
-                    await SendPlatformNotificationsAsync(androidPayload, iOSPayload, tags, token);
+                    var valores = valor.Split(";");
+                    query = from dispositivoBanco in query
+                        where dispositivoBanco.Metadados.Any(metadado =>
+                            metadado.Identificador == identificador && valores.Contains(metadado.Valor))
+                        select dispositivoBanco;
                 }
                 else
                 {
-                    var notificationTasks = tags
-                        .Select((value, index) => (value, index))
-                        .GroupBy(g => g.index / 20, i => i.value)
-                        .Select(tags => SendPlatformNotificationsAsync(androidPayload, iOSPayload, tags, token));
-
-                    await Task.WhenAll(notificationTasks);
+                    query = from dispositivoBanco in query
+                        where dispositivoBanco.Metadados.Any(metadado =>
+                            metadado.Identificador == identificador && metadado.Valor == valor)
+                        select dispositivoBanco;
                 }
-
-                _logger.LogInformation("Notificação enviada");
-                return true;
             }
-            catch (Exception e)
+
+            var dispositivos = await query.ToListAsync();
+
+            dto.Payload.Add("tipoNotificacao", dto.Tipo);
+
+            var mensagens = dispositivos.Select(dispositivo => new Message
             {
-                _logger.LogError(e, "Erro inseperado ao enviar notificações");
-                return false;
-            }
-        }
+                Token = dispositivo.FcmToken,
+                Notification = new Notification
+                {
+                    Title = dto.Titulo,
+                    Body = dto.Texto
+                },
+                Data = dto.Payload
+            });
 
-        string PrepareNotificationPayload(string template, string text, string action, string licitacao) => template
-            .Replace("$(licitacao)", licitacao, StringComparison.InvariantCulture)
-            .Replace("$(alertMessage)", text, StringComparison.InvariantCulture)
-            .Replace("$(alertAction)", action, StringComparison.InvariantCulture);
+            var response = await FirebaseMessaging.DefaultInstance.SendAllAsync(mensagens);
 
-        Task SendPlatformNotificationsAsync(string androidPayload, string iOSPayload, CancellationToken token)
-        {
-            var sendTasks = new Task[]
-            {
-                _hub.SendFcmNativeNotificationAsync(androidPayload, token),
-                _hub.SendAppleNativeNotificationAsync(iOSPayload, token)
-            };
-
-            return Task.WhenAll(sendTasks);
-        }
-
-        Task SendPlatformNotificationsAsync(string androidPayload, string iOSPayload, IEnumerable<string> tags,
-            CancellationToken token)
-        {
-            var sendTasks = new Task[]
-            {
-                _hub.SendFcmNativeNotificationAsync(androidPayload, tags, token),
-                _hub.SendAppleNativeNotificationAsync(iOSPayload, tags, token)
-            };
-
-            return Task.WhenAll(sendTasks);
+            return response.FailureCount == 0;
         }
     }
 }

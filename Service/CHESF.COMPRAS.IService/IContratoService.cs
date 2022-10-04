@@ -8,6 +8,7 @@ namespace CHESF.COMPRAS.IService
     public interface IContratoService
     {
         Task<IEnumerable<Contrato>> Listar(ListaQueryParams queryParams);
+        Task<Contrato?> Detalhar(string numeroContrato);
         Task<IEnumerable<NotaFiscal>> ListarNotasFiscais(int idContrato, ListaQueryParams queryParams);
     }
 }

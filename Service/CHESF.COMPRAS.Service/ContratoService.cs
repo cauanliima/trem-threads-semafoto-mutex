@@ -67,6 +67,46 @@ namespace CHESF.COMPRAS.Service
             return contratos;
         }
 
+        public async Task<Contrato?> Detalhar(string numeroContrato)
+        {
+            var cnpj = _tokenService.GetTokenCNPJ();
+
+            if (cnpj == null) return null;
+
+            var agora = DateTime.UtcNow;
+            
+            var contrato = await (await _contratoFornecedorRepository.GetAll())
+                .Where(
+                    contratoFornecedor => contratoFornecedor.Fornecedor!.CNPJ == cnpj
+                    && contratoFornecedor.Contrato.Numero == numeroContrato
+                    && (contratoFornecedor.DataInicio == null || contratoFornecedor.DataInicio <= agora)
+                    && (contratoFornecedor.DataFim == null || contratoFornecedor.DataFim!.Value.AddDays(90) >= agora)
+                    && !(contratoFornecedor.DataInicio == null && contratoFornecedor.DataFim == null)
+                )
+                .Include(contratoFornecedor => contratoFornecedor.Contrato)
+                .ThenInclude(contrato => contrato.NotasFiscais)
+                .Select(contratoFornecedor => contratoFornecedor.Contrato)
+                .FirstOrDefaultAsync();
+
+            if (contrato == null)
+            {
+                return null;
+            }
+
+            if ((contrato.NotasFiscais?.Count ?? 0) <= 0) return contrato;
+            
+            var ultimaNotaFiscal = contrato.NotasFiscais!.OrderByDescending(nota => nota.DataEmissao).First();
+
+            if (ultimaNotaFiscal.IdAdministrador != null)
+            {
+                contrato.Administrador = await _usuarioRepository.FirstOrDefault(usuario =>
+                    usuario.Codigo == ultimaNotaFiscal.IdAdministrador
+                );
+            }
+
+            return contrato;
+        }
+
         public async Task<IEnumerable<NotaFiscal>> ListarNotasFiscais(int idContrato, ListaQueryParams queryParams)
         {
             var cnpj = _tokenService.GetTokenCNPJ();

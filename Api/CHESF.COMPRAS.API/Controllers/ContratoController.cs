@@ -30,6 +30,20 @@ namespace CHESF.COMPRAS.API.Controllers
             var contratos = await _contratoService.Listar(queryParams);
             return Ok(contratos.ToList());
         }
+
+        [HttpGet]
+        [Route("porNumeroContrato/{numeroContrato}/")]
+        public async Task<ActionResult<Contrato>> Detalhar(string numeroContrato)
+        {
+            var contrato = await _contratoService.Detalhar(numeroContrato);
+
+            if (contrato == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(contrato);
+        }
         
         [HttpGet]
         [Route("{id:int}/notas-fiscais/")]

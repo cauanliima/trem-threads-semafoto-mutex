@@ -17,6 +17,7 @@ namespace CHESF.COMPRAS.Repository
        
         public async Task<IList<NotaFiscal>> ListarParaContrato(int idContrato, int pagina, int total)
         {
+            var situacoesPagamento = new List<int> {1, 2};
             return await _entities
                 .AsNoTracking()
                 .Include(notaFiscal => notaFiscal.StatusNotaFiscal)
@@ -25,6 +26,30 @@ namespace CHESF.COMPRAS.Repository
                 .OrderByDescending(notaFiscal => notaFiscal.DataEmissao)
                 .Skip(pagina > 0 ? (pagina - 1) * total : 0)
                 .Take(total)
+                .Select(notaFiscal =>
+                {
+                    return new NotaFiscal
+                    {
+                        Codigo = notaFiscal.Codigo,
+                        Numero = notaFiscal.Numero,
+                        Fornecedor = notaFiscal.Fornecedor,
+                        IdContrato = notaFiscal.IdContrato,
+                        Valor = notaFiscal.Valor,
+                        Mes = notaFiscal.Mes,
+                        Ano = notaFiscal.Ano,
+                        IdAdministrador = notaFiscal.IdAdministrador,
+                        DataEmissao = notaFiscal.DataEmissao,
+                        DataInclusao = notaFiscal.DataInclusao,
+                        IdStatus = notaFiscal.IdStatus,
+                        Contrato = notaFiscal.Contrato,
+                        StatusNotaFiscal = notaFiscal.StatusNotaFiscal,
+                        HistoricoNotaFiscal = notaFiscal.HistoricoNotaFiscal,
+                        DataPagamento = notaFiscal.HistoricoNotaFiscal.Where(
+                            historico => situacoesPagamento.Contains(historico.IdStatus)).
+                            OrderBy(historico => historico.DataInclusao).
+                            Select( historico => historico.DataInclusao).FirstOrDefault()
+                    };
+                })
                 .ToListAsync();
         }
     }

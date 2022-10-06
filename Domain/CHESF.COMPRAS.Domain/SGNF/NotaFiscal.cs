@@ -10,6 +10,11 @@ namespace CHESF.COMPRAS.Domain.SGNF
     [Table("TB_NOTA_FISCAL")]
     public class NotaFiscal
     {
+        public NotaFiscal()
+        {
+            HistoricoNotaFiscal = new List<StatusNotaFiscal>();
+        }
+        
         [Key] [Column("CD_NOTA_FISCAL")] public int Codigo { get; set; }
         
         [Column("NR_NOTA_FISCAL")] public string Numero { get; set; }
@@ -40,12 +45,12 @@ namespace CHESF.COMPRAS.Domain.SGNF
         public virtual Contrato? Contrato { get; set; }
         
         [JsonIgnore]
-        [ForeignKey("IdStatus")]
         public virtual StatusNotaFiscal? StatusNotaFiscal { get; set; }
         
         [JsonIgnore]
-        public virtual List<StatusNotaFiscal> HistoricoNotaFiscal { get; set; }
+        public List<StatusNotaFiscal> HistoricoNotaFiscal { get; set; }
 
+        [NotMapped]
         public virtual StatusDTO? Status => StatusDTO.FromStatusNotaFiscal(StatusNotaFiscal);
         
         [NotMapped] public DateTime? DataPagamento { get; set; }

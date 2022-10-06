@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace CHESF.COMPRAS.Domain.SGNF
 {
@@ -17,5 +19,11 @@ namespace CHESF.COMPRAS.Domain.SGNF
         
         [ForeignKey("IdStatus")]
         public virtual Status Status { get; set; }
+        
+        [JsonIgnore]
+        public virtual NotaFiscal NotaFiscal { get; set; }
+        
+        [JsonIgnore]
+        public List<NotaFiscal> NotasFiscais { get; set; }
     }
 }

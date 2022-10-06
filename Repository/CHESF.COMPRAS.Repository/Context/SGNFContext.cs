@@ -26,7 +26,14 @@ namespace CHESF.COMPRAS.Repository.Context
             modelBuilder.Entity<Fornecedor>();
             modelBuilder.Entity<Status>();
             modelBuilder.Entity<ContratoFornecedor>();
-            modelBuilder.Entity<NotaFiscal>();
+            modelBuilder.Entity<NotaFiscal>()
+                .HasMany(nota => nota.HistoricoNotaFiscal)
+                .WithOne(status => status.NotaFiscal)
+                .HasForeignKey(status => status.IdNotaFiscal);
+            modelBuilder.Entity<NotaFiscal>()
+                .HasOne<StatusNotaFiscal>(nota => nota.StatusNotaFiscal)
+                .WithMany(status => status.NotasFiscais)
+                .HasForeignKey(nota => nota.IdStatus);
             modelBuilder.Entity<StatusNotaFiscal>();
             modelBuilder.Entity<Usuario>();
 

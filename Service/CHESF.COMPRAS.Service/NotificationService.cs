@@ -121,7 +121,7 @@ namespace CHESF.COMPRAS.Service
             metadados.Add("LISTA:LICITACOES_FAVORITAS", notificationRequest.CodigoLicitacao);
             payload.Add("codigoLicitacao", notificationRequest.CodigoLicitacao);
            
-            return await NotificarAsync(new NotificarDTO
+            return (await NotificarAsync(new NotificarDTO
             {
                 Titulo = null,
                 Tipo = "ANEXO_LICITACAO",
@@ -129,10 +129,10 @@ namespace CHESF.COMPRAS.Service
                 Cnpj = null,
                 Metadados = metadados,
                 Payload = payload
-            });
+            })).SucessoContagem > 0;
         }
 
-        public async Task<bool> NotificarAsync(NotificarDTO dto)
+        public async Task<NotificarResultadoDTO> NotificarAsync(NotificarDTO dto)
         {
             var query = from dispositivoBanco in await _dispositivoRepository.GetAll() select dispositivoBanco;
 
@@ -179,7 +179,30 @@ namespace CHESF.COMPRAS.Service
 
             var response = await FirebaseMessaging.DefaultInstance.SendAllAsync(mensagens);
 
-            return response.FailureCount == 0;
+            var dispositivosComFalhas = response.Responses.Select((r, i) => (r, i)).Aggregate(
+                new List<NotificarResultadoFalhaDispositivoDTO>(),
+                (acc, r) =>
+            {
+                if (r.r.IsSuccess)
+                {
+                    return acc;
+                }
+                
+                acc.Add(new NotificarResultadoFalhaDispositivoDTO
+                {
+                    Id = dispositivos[r.i].Id,
+                    MensagemFalha = r.r.Exception.Message
+                });
+               
+                return acc;
+            });
+            
+            return new NotificarResultadoDTO
+            {
+                FalhaContagem = response.FailureCount,
+                SucessoContagem = response.SuccessCount,
+                DispositivosComFalha = dispositivosComFalhas
+            };
         }
     }
 }

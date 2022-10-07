@@ -10,7 +10,7 @@ namespace CHESF.COMPRAS.IService
     public interface INotificationService
     {
         Task<bool> AtualizarRegistroDispositivoAsync(DispositivoDTO dispositivo, CancellationToken token);
-        Task<bool> NotificarAsync(NotificarDTO dto);
+        Task<NotificarResultadoDTO> NotificarAsync(NotificarDTO dto);
         Task<bool> RequestNotificationAsync(NotificationRequest notificationRequest, CancellationToken token);
     }
 }

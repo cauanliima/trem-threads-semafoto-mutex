@@ -40,16 +40,10 @@ namespace CHESF.COMPRAS.API.Controllers
 
         [HttpPost]
         [Route("notificar")]
-        public async Task<IActionResult> Notificar([FromBody] NotificarDTO dto)
+        public async Task<ActionResult<NotificarResultadoDTO>> Notificar([FromBody] NotificarDTO dto)
         {
-            var success = await _notificationService.NotificarAsync(dto);
-
-            if (!success)
-            {
-                return BadRequest();
-            }
-            
-            return Ok();
+            var resultado = await _notificationService.NotificarAsync(dto);
+            return Ok(resultado);
         }
 
         [HttpPost]

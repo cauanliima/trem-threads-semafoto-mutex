@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using CHESF.COMPRAS.Domain.DTOs;
@@ -9,6 +10,11 @@ namespace CHESF.COMPRAS.Domain.SGNF
     [Table("TB_NOTA_FISCAL")]
     public class NotaFiscal
     {
+        public NotaFiscal()
+        {
+            HistoricoNotaFiscal = new List<StatusNotaFiscal>();
+        }
+        
         [Key] [Column("CD_NOTA_FISCAL")] public int Codigo { get; set; }
         
         [Column("NR_NOTA_FISCAL")] public string Numero { get; set; }
@@ -29,7 +35,7 @@ namespace CHESF.COMPRAS.Domain.SGNF
         [Column("DT_EMISSAO")] public DateTime? DataEmissao { get; set; }
         
         [Column("DT_INCLUSAO")] public DateTime? DataInclusao { get; set; }
-       
+
         [JsonIgnore]
         [Column("CD_NOTA_FISCAL_STATUS_NOTA")]
         public int? IdStatus { get; set; }
@@ -39,9 +45,14 @@ namespace CHESF.COMPRAS.Domain.SGNF
         public virtual Contrato? Contrato { get; set; }
         
         [JsonIgnore]
-        [ForeignKey("IdStatus")]
         public virtual StatusNotaFiscal? StatusNotaFiscal { get; set; }
+        
+        [JsonIgnore]
+        public List<StatusNotaFiscal> HistoricoNotaFiscal { get; set; }
 
+        [NotMapped]
         public virtual StatusDTO? Status => StatusDTO.FromStatusNotaFiscal(StatusNotaFiscal);
+        
+        [NotMapped] public DateTime? DataPagamento { get; set; }
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using CHESF.COMPRAS.API.Scheduler;
+using CHESF.COMPRAS.API.Scheduler.Settings;
 using CHESF.COMPRAS.IRepository;
 using CHESF.COMPRAS.IRepository.Base;
 using CHESF.COMPRAS.IRepository.UnitOfWork;
@@ -26,6 +28,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using Quartz;
 
 namespace CHESF.COMPRAS.API
 {
@@ -189,6 +192,15 @@ namespace CHESF.COMPRAS.API
             });
 
             #endregion
+            
+            services.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionScopedJobFactory();
+                q.AddJobAndTrigger<JobNotificacaoPagamento>(Configuration);
+            });
+
+            services.AddQuartzHostedService(
+                q => q.WaitForJobsToComplete = true);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

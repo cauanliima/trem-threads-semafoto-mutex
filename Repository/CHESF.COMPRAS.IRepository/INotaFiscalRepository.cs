@@ -8,5 +8,8 @@ namespace CHESF.COMPRAS.IRepository
     public interface INotaFiscalRepository : IRepositoryBase<NotaFiscal>
     {
         public Task<IList<NotaFiscal>> ListarParaContrato(int idContrato, int pagina, int total);
+
+        public Task<IList<NotaFiscal>> ListarNotaFiscalPagasNaoNotificadas();
+
     }
 }

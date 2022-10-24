@@ -30,7 +30,7 @@ namespace CHESF.COMPRAS.Repository
                 {
                     Codigo = notaFiscal.Codigo,
                     Numero = notaFiscal.Numero,
-                    Fornecedor = notaFiscal.Fornecedor,
+                    IdFornecedor = notaFiscal.IdFornecedor,
                     IdContrato = notaFiscal.IdContrato,
                     Valor = notaFiscal.Valor,
                     Mes = notaFiscal.Mes,
@@ -49,5 +49,43 @@ namespace CHESF.COMPRAS.Repository
                 })
                 .ToListAsync();
         }
+        
+        public async Task<IList<NotaFiscal>> ListarNotaFiscalPagasNaoNotificadas()
+        {
+            var situacoesPagamento = new List<int> {31, 35};
+            var indicadorPagamentoNotaFiscal = 3;
+            return await _entities
+                .AsNoTracking()
+                .Include(notafiscal => notafiscal.Fornecedor)
+                .Include(notaFiscal => notaFiscal.StatusNotaFiscal)
+                .ThenInclude(statusNotaFiscal => statusNotaFiscal.Status)
+                .Where(notaFiscal => notaFiscal.IndicadorPagamentoNotaFiscal == indicadorPagamentoNotaFiscal)
+                .OrderByDescending(notaFiscal => notaFiscal.DataEmissao)
+                .Select(notaFiscal => new NotaFiscal
+                {
+                    Codigo = notaFiscal.Codigo,
+                    Numero = notaFiscal.Numero,
+                    IdFornecedor = notaFiscal.IdFornecedor,
+                    IdContrato = notaFiscal.IdContrato,
+                    Valor = notaFiscal.Valor,
+                    Mes = notaFiscal.Mes,
+                    Ano = notaFiscal.Ano,
+                    IdAdministrador = notaFiscal.IdAdministrador,
+                    DataEmissao = notaFiscal.DataEmissao,
+                    DataInclusao = notaFiscal.DataInclusao,
+                    IdStatus = notaFiscal.IdStatus,
+                    Contrato = notaFiscal.Contrato,
+                    StatusNotaFiscal = notaFiscal.StatusNotaFiscal,
+                    Fornecedor = notaFiscal.Fornecedor,
+                    HistoricoNotaFiscal = notaFiscal.HistoricoNotaFiscal,
+                    DataPagamento = notaFiscal.HistoricoNotaFiscal.Where(
+                            historico => situacoesPagamento.Contains(historico.IdStatus)).
+                        OrderBy(historico => historico.DataInclusao).
+                        Select( historico => historico.DataInclusao).FirstOrDefault()
+                })
+                .ToListAsync();
+        }
+        
+        
     }
 }

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using CHESF.COMPRAS.API.Config.Security;
+using CHESF.COMPRAS.API.Scheduler;
+using CHESF.COMPRAS.API.Scheduler.Settings;
 using CHESF.COMPRAS.IRepository;
 using CHESF.COMPRAS.IRepository.Base;
 using CHESF.COMPRAS.IRepository.UnitOfWork;
@@ -26,6 +29,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using Quartz;
 
 namespace CHESF.COMPRAS.API
 {
@@ -103,7 +107,6 @@ namespace CHESF.COMPRAS.API
 
             services.AddScoped(typeof(IEComprasUnitOfWork), typeof(EcomprasUnitOfWork));
             services.AddScoped(typeof(ISGNFUnitOfWork), typeof(SGNFUnitOfWork));
-
             services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
 
             //Repository
@@ -115,6 +118,8 @@ namespace CHESF.COMPRAS.API
             services.AddTransient<INotaFiscalRepository, NotaFiscalRepository>();
             services.AddTransient<IDispositivoRepository, DispositivoRepository>();
             services.AddTransient<IDispositivoMetadadoRepository, DispositivoMetadadoRepository>();
+            services.AddTransient<INotificacaoRepository, NotificacaoRepository>();
+            services.AddTransient<INotificacaoDispositivoRepository, NotificacaoDispositivoRepository>();
 
             //Service
             services.AddTransient<ITokenService, TokenService>();
@@ -123,6 +128,9 @@ namespace CHESF.COMPRAS.API
             services.AddTransient<INotificationService, NotificationService>().AddOptions();
             services.AddTransient<ILoginService, LoginService>();
             services.AddTransient<IContratoService, ContratoService>();
+            services.AddTransient<IGerarNotificacaoPagamentoService, GerarNotificacaoPagamentoService>();
+
+            services.AddScoped<DispositivoUidAttribute>();
 
             #endregion
 
@@ -131,6 +139,7 @@ namespace CHESF.COMPRAS.API
             services.AddSwaggerGen(c =>
             {
                 const string securityDefinition = "ApiKey";
+                const string dispositivoUidDefinition = "DispositivoUID";
 
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
@@ -142,6 +151,28 @@ namespace CHESF.COMPRAS.API
                     In = ParameterLocation.Header,
                     Name = "X-API-KEY",
                     Type = SecuritySchemeType.ApiKey
+                });
+                
+                c.AddSecurityDefinition(dispositivoUidDefinition, new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Name = "X-DISPOSITIVO-UID",
+                    Type = SecuritySchemeType.ApiKey
+                });
+                
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Name = "X-DISPOSITIVO-UID",
+                            Type = SecuritySchemeType.ApiKey,
+                            In = ParameterLocation.Header,
+                            Reference = new OpenApiReference
+                                { Type = ReferenceType.SecurityScheme, Id = dispositivoUidDefinition }
+                        },
+                        new List<string>()
+                    }
                 });
 
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -189,6 +220,15 @@ namespace CHESF.COMPRAS.API
             });
 
             #endregion
+            
+            services.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionScopedJobFactory();
+                q.AddJobAndTrigger<JobNotificacaoPagamento>(Configuration);
+            });
+
+            services.AddQuartzHostedService(
+                q => q.WaitForJobsToComplete = true);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

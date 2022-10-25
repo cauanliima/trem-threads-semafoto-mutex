@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CHESF.COMPRAS.Domain.APP;
 using CHESF.COMPRAS.Domain.DTOs;
 using CHESF.COMPRAS.Domain.E_Edital;
+using CHESF.COMPRAS.Domain.QueryParams;
 using CHESF.COMPRAS.IRepository;
 using CHESF.COMPRAS.IService;
 using FirebaseAdmin.Messaging;
@@ -19,16 +20,22 @@ namespace CHESF.COMPRAS.Service
         readonly ILogger<NotificationService> _logger;
         private readonly IDispositivoRepository _dispositivoRepository;
         private readonly IDispositivoMetadadoRepository _dispositivoMetadadoRepository;
+        private readonly INotificacaoRepository _notificacaoRepository;
+        private readonly INotificacaoDispositivoRepository _notificacaoDispositivoRepository;
 
         public NotificationService(
             ILogger<NotificationService> logger,
             IDispositivoRepository dispositivoRepository,
-            IDispositivoMetadadoRepository dispositivoMetadadoRepository
+            IDispositivoMetadadoRepository dispositivoMetadadoRepository,
+            INotificacaoRepository notificacaoRepository,
+            INotificacaoDispositivoRepository notificacaoDispositivoRepository
         )
         {
             _logger = logger;
             _dispositivoRepository = dispositivoRepository;
             _dispositivoMetadadoRepository = dispositivoMetadadoRepository;
+            _notificacaoRepository = notificacaoRepository;
+            _notificacaoDispositivoRepository = notificacaoDispositivoRepository;
         }
 
         public async Task<bool> AtualizarRegistroDispositivoAsync(DispositivoDTO dto, CancellationToken token)
@@ -132,6 +139,32 @@ namespace CHESF.COMPRAS.Service
             })).SucessoContagem > 0;
         }
 
+        public async Task<List<Notificacao>> ListarAsync(
+            Dispositivo dispositivo,
+            NotificacoesQueryParams queryParams,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var query = from notificacao in await _notificacaoRepository.GetAll()
+                where notificacao.TentativasEntregas.Any(
+                    tentativa => tentativa.DataEntregue != null && tentativa.IdDispositivo == dispositivo.Id
+                )
+                select notificacao;
+
+            if (queryParams.Tipo != null)
+            {
+                query = from notificacao in query
+                    where notificacao.Tipo == queryParams.Tipo
+                    select notificacao;
+            }
+
+            return await query
+                .OrderByDescending(notificacao => notificacao.DataCadastro)
+                .Skip(queryParams.Pagina * queryParams.Total)
+                .Take(queryParams.Total)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<NotificarResultadoDTO> NotificarAsync(NotificarDTO dto)
         {
             var query = from dispositivoBanco in await _dispositivoRepository.GetAll() select dispositivoBanco;
@@ -164,6 +197,16 @@ namespace CHESF.COMPRAS.Service
 
             var dispositivos = await query.ToListAsync();
 
+            if (dispositivos.Count == 0)
+            {
+                return new NotificarResultadoDTO
+                {
+                    FalhaContagem = 0,
+                    SucessoContagem = 0,
+                    DispositivosComFalha = new List<NotificarResultadoFalhaDispositivoDTO>()
+                };
+            }
+
             dto.Payload.Add("tipoNotificacao", dto.Tipo);
 
             var mensagens = dispositivos.Select(dispositivo => new Message
@@ -176,26 +219,66 @@ namespace CHESF.COMPRAS.Service
                 },
                 Data = dto.Payload
             });
+            
+            var notificacao = await _notificacaoRepository.Insert(new Notificacao
+            {
+                Titulo = dto.Titulo,
+                Tipo = dto.Tipo,
+                Cnpj = dto.Cnpj,
+                Texto = dto.Texto,
+                Payload = dto.Payload,
+                Metadados = dto.Metadados,
+                DataCadastro = DateTime.UtcNow
+            });
+            
+            await _notificacaoRepository.SaveChanges();
+            _notificacaoRepository.DetachAll();
+
+            var tentativas = dispositivos.Select(dispositivo => new NotificacaoDispositivo
+            {
+                IdDispositivo = dispositivo.Id,
+                IdNotificacao = notificacao.Id,
+                DataUltimaTentativaEntrega = DateTime.UtcNow
+            }).ToList();
 
             var response = await FirebaseMessaging.DefaultInstance.SendAllAsync(mensagens);
-
-            var dispositivosComFalhas = response.Responses.Select((r, i) => (r, i)).Aggregate(
-                new List<NotificarResultadoFalhaDispositivoDTO>(),
-                (acc, r) =>
+            
+            for (var i = 0; i < response.Responses.Count; i++)
             {
-                if (r.r.IsSuccess)
+                var resposta = response.Responses[i];
+
+                if (resposta.IsSuccess)
                 {
-                    return acc;
+                    tentativas[i].DataEntregue = DateTime.UtcNow;
                 }
-                
-                acc.Add(new NotificarResultadoFalhaDispositivoDTO
+                else
                 {
-                    Id = dispositivos[r.i].Id,
-                    MensagemFalha = r.r.Exception.Message
-                });
-               
-                return acc;
-            });
+                    tentativas[i].CodigoFalha = (int)resposta.Exception.ErrorCode;
+                    tentativas[i].CodigoFalhaFcm = resposta.Exception.MessagingErrorCode == null
+                        ? null
+                        : (int) resposta.Exception.MessagingErrorCode;
+                    tentativas[i].Falha = resposta.Exception.Message;
+                }
+            }
+
+            var dispositivosComFalhas = new List<NotificarResultadoFalhaDispositivoDTO>();
+            
+            foreach (var notificacaoDispositivo in tentativas)
+            {
+                if (notificacaoDispositivo.Falha != null)
+                {
+                    dispositivosComFalhas.Add(new NotificarResultadoFalhaDispositivoDTO
+                    {
+                        Id = notificacaoDispositivo.IdDispositivo,
+                        MensagemFalha = notificacaoDispositivo.Falha
+                    });
+                }
+
+                await _notificacaoDispositivoRepository.Insert(notificacaoDispositivo);
+            }
+
+            await _notificacaoDispositivoRepository.SaveChanges();
+            _notificacaoDispositivoRepository.DetachAll();
             
             return new NotificarResultadoDTO
             {

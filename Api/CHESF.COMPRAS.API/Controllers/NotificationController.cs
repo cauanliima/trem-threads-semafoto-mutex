@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Net;
@@ -7,6 +8,8 @@ using System.Threading.Tasks;
 using CHESF.COMPRAS.API.Config.Security;
 using CHESF.COMPRAS.Domain.APP;
 using CHESF.COMPRAS.Domain.DTOs;
+using CHESF.COMPRAS.Domain.E_Edital;
+using CHESF.COMPRAS.Domain.QueryParams;
 using CHESF.COMPRAS.IService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,10 +21,35 @@ namespace CHESF.COMPRAS.API.Controllers
     public class NotificationsController : ControllerBase
     {
         private readonly INotificationService _notificationService;
+        private readonly IGerarNotificacaoPagamentoService _gerarNotificacaoPagamentoService;
 
-        public NotificationsController(INotificationService notificationService)
+        public NotificationsController(
+            INotificationService notificationService,
+            IGerarNotificacaoPagamentoService gerarNotificacaoPagamentoService
+        )
         {
             _notificationService = notificationService;
+            _gerarNotificacaoPagamentoService = gerarNotificacaoPagamentoService;
+        }
+
+        [ServiceFilter(typeof(DispositivoUidAttribute))]
+        [HttpGet]
+        [Route("")]
+        public async Task<ActionResult<List<Notificacao>>> Listar([FromQuery] NotificacoesQueryParams queryParams)
+        {
+            var dispositivo = (Dispositivo) HttpContext.Items["Dispositivo"];
+
+            var notificacoes = await _notificationService.ListarAsync(dispositivo, queryParams);
+            
+            return Ok(notificacoes);
+        }
+        
+        [HttpPost]
+        [Route("gerar-notificacoes-pagamento")]
+        public async Task<IActionResult> GerarNotificacoesPagamento()
+        {
+            await _gerarNotificacaoPagamentoService.GerarPagamentos();
+            return Ok();
         }
 
         [HttpPut]

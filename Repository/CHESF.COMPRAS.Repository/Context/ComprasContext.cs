@@ -18,7 +18,9 @@ namespace CHESF.COMPRAS.Repository.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Notificacao>();
             modelBuilder.Entity<Dispositivo>();
+            modelBuilder.Entity<NotificacaoDispositivo>();
             modelBuilder.Entity<DispositivoMetadado>();
             modelBuilder.Entity<Anexo>();
 

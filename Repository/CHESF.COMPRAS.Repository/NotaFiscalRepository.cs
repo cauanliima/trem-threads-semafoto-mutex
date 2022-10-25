@@ -53,7 +53,7 @@ namespace CHESF.COMPRAS.Repository
         public async Task<IList<NotaFiscal>> ListarNotaFiscalPagasNaoNotificadas()
         {
             var situacoesPagamento = new List<int> {31, 35};
-            var indicadorPagamentoNotaFiscal = 3;
+            var indicadorPagamentoNotaFiscal = (int)NotaFiscal.StatusNotificacao.PagaENaoNotificada;
             return await _entities
                 .AsNoTracking()
                 .Include(notafiscal => notafiscal.Fornecedor)

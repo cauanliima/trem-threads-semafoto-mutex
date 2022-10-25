@@ -49,8 +49,8 @@ namespace CHESF.COMPRAS.Service
                 .Include(contratoFornecedor => contratoFornecedor.Contrato)
                 .ThenInclude(contrato => contrato.NotasFiscais)
                 .Select(contratoFornecedor => contratoFornecedor.Contrato)
-                .Skip(queryParams.pagina > 0 ? (queryParams.pagina - 1) * queryParams.total : 0)
-                .Take(queryParams.total)
+                .Skip(queryParams.Pagina > 0 ? (queryParams.Pagina - 1) * queryParams.Total : 0)
+                .Take(queryParams.Total)
                 .ToListAsync();
 
             foreach (var contrato in contratos.Where(contrato => (contrato.NotasFiscais?.Count ?? 0) > 0))
@@ -113,7 +113,7 @@ namespace CHESF.COMPRAS.Service
 
             if (cnpj == null) return Enumerable.Empty<NotaFiscal>();
 
-            return await _notaFiscalRepository.ListarParaContrato(idContrato, queryParams.pagina, queryParams.total);
+            return await _notaFiscalRepository.ListarParaContrato(idContrato, queryParams.Pagina, queryParams.Total);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace CHESF.COMPRAS.IRepository.Base
 {
@@ -23,6 +24,7 @@ namespace CHESF.COMPRAS.IRepository.Base
         Task<T> Insert(T entity, bool commit, bool detach);
         Task<T> Update(T entity);
         Task<T> Update(T entity, bool commit, bool detach);
+        EntityEntry<T> GetEntry(T entity);
         void Detach(T entity);
         void DetachAll();
         void ClearEntities();

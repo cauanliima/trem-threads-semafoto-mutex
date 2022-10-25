@@ -8,17 +8,25 @@ namespace CHESF.COMPRAS.API.Scheduler
 {
     public class JobNotificacaoPagamento : Rotina
     {
-        
         private readonly ILogger<JobNotificacaoPagamento> _logger;
-        private readonly IGerarNotificacaoPagamentoService _pagamentoService;
-        
+        private readonly IGerarNotificacaoPagamentoService _gerarNotificacaoPagamentoService;
+
+        public JobNotificacaoPagamento(
+            ILogger<JobNotificacaoPagamento> logger,
+            IGerarNotificacaoPagamentoService gerarNotificacaoPagamentoService
+        )
+        {
+            _logger = logger;
+            _gerarNotificacaoPagamentoService = gerarNotificacaoPagamentoService;
+        }
+
         protected override string NomeRotina => "JobNotificacaoPagamento";
-        
+
         protected override async Task ProcessarRotina(IJobExecutionContext context)
         {
             try
             {
-                await _pagamentoService.GerarPagamentos();
+                await _gerarNotificacaoPagamentoService.GerarPagamentos();
             }
             catch (Exception)
             {

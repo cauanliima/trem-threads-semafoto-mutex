@@ -10,6 +10,13 @@ namespace CHESF.COMPRAS.Domain.SGNF
     [Table("TB_NOTA_FISCAL")]
     public class NotaFiscal
     {
+        public enum StatusNotificacao
+        {
+            NaoPaga = 1,
+            PagaENaoNotificada = 2,
+            PagaENotificada = 3
+        }
+       
         public NotaFiscal()
         {
             HistoricoNotaFiscal = new List<StatusNotaFiscal>();

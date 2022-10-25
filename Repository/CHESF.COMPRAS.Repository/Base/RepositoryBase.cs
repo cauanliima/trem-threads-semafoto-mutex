@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CHESF.COMPRAS.IRepository.Base;
 using CHESF.COMPRAS.IRepository.UnitOfWork;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace CHESF.COMPRAS.Repository.Base
 {
@@ -140,7 +141,12 @@ namespace CHESF.COMPRAS.Repository.Base
         
             return entity;
         }
-        
+
+        public EntityEntry<T> GetEntry(T entity)
+        {
+            return UnitOfWork.Context.Entry(entity);
+        }
+
         public async Task<T> Update(T entityToUpdate, bool commit = true, bool detach = false)
         {
             _entities.Attach(entityToUpdate);

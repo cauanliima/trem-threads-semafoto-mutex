@@ -32,7 +32,7 @@ namespace CHESF.COMPRAS.Repository
                     Numero = notaFiscal.Numero,
                     IdFornecedor = notaFiscal.IdFornecedor,
                     IdContrato = notaFiscal.IdContrato,
-                    Valor = notaFiscal.Valor,
+                    Valor = notaFiscal.Valor + notaFiscal.ValorReajuste,
                     Mes = notaFiscal.Mes,
                     Ano = notaFiscal.Ano,
                     IdAdministrador = notaFiscal.IdAdministrador,
@@ -40,6 +40,8 @@ namespace CHESF.COMPRAS.Repository
                     DataInclusao = notaFiscal.DataInclusao,
                     IdStatus = notaFiscal.IdStatus,
                     Contrato = notaFiscal.Contrato,
+                    PagamentoNotificado = notaFiscal.PagamentoNotificado,
+                    ValorReajuste = notaFiscal.ValorReajuste,
                     StatusNotaFiscal = notaFiscal.StatusNotaFiscal,
                     HistoricoNotaFiscal = notaFiscal.HistoricoNotaFiscal,
                     DataPagamento = notaFiscal.HistoricoNotaFiscal.Where(
@@ -67,7 +69,7 @@ namespace CHESF.COMPRAS.Repository
                     Numero = notaFiscal.Numero,
                     IdFornecedor = notaFiscal.IdFornecedor,
                     IdContrato = notaFiscal.IdContrato,
-                    Valor = notaFiscal.Valor,
+                    Valor = notaFiscal.Valor + notaFiscal.ValorReajuste,
                     Mes = notaFiscal.Mes,
                     Ano = notaFiscal.Ano,
                     IdAdministrador = notaFiscal.IdAdministrador,
@@ -78,6 +80,7 @@ namespace CHESF.COMPRAS.Repository
                     StatusNotaFiscal = notaFiscal.StatusNotaFiscal,
                     Fornecedor = notaFiscal.Fornecedor,
                     PagamentoNotificado = notaFiscal.PagamentoNotificado,
+                    ValorReajuste = notaFiscal.ValorReajuste,
                     HistoricoNotaFiscal = notaFiscal.HistoricoNotaFiscal,
                     DataPagamento = notaFiscal.HistoricoNotaFiscal.Where(
                             historico => situacoesPagamento.Contains(historico.IdStatus)).

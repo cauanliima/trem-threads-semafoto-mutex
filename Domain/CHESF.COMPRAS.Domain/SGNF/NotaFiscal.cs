@@ -26,6 +26,8 @@ namespace CHESF.COMPRAS.Domain.SGNF
         
         [Column("VL_NOTA")] public double? Valor { get; set; }
         
+        [Column("VL_REAJUSTE")] public double? ValorReajuste { get; set; }
+        
         [Column("NR_MES")] public int? Mes { get; set; }
         
         [Column("NR_ANO")] public int? Ano { get; set; }

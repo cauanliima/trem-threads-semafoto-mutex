@@ -1,9 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using CHESF.COMPRAS.API.Config.Security;
 using CHESF.COMPRAS.Domain.APP;

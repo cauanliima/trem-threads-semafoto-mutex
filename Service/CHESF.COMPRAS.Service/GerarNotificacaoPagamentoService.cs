@@ -47,7 +47,7 @@ namespace CHESF.COMPRAS.Service
                     dto.Tipo = "PAGAMENTO_CONTRATO";
                     dto.Titulo = "E-Compras - CHESF - Pagamento Realizado";
                     dto.Texto =
-                        $"O pagamento da nota fiscal de número {notaFiscal.Numero}, no valor de R$ {notaFiscal.Valor?.ToString("C", ptBrCulture)}, " +
+                        $"O pagamento da nota fiscal de número {notaFiscal.Numero}, no valor de {notaFiscal.Valor?.ToString("C", ptBrCulture)}, " +
                         $"foi realizado em {dataPagamento}.";
                     dto.Payload = new Dictionary<string, string>();
                     dto.Metadados = new Dictionary<string, string>();

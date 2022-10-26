@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using CHESF.COMPRAS.Domain.DTOs;
 using CHESF.COMPRAS.Domain.SGNF;
@@ -31,6 +33,7 @@ namespace CHESF.COMPRAS.Service
        
         public async Task GerarPagamentos()
         {
+            var ptBrCulture = new CultureInfo("pt-BR");
             _logger.LogInformation("Iniciando envio de notificações de pagamento das notas fiscais");
            
             var notasFiscais = await _notaFiscalRepository.ListarNotaFiscalPagasNaoNotificadas();
@@ -44,7 +47,7 @@ namespace CHESF.COMPRAS.Service
                     dto.Tipo = "PAGAMENTO_CONTRATO";
                     dto.Titulo = "E-Compras - CHESF - Pagamento Realizado";
                     dto.Texto =
-                        $"O pagamento da nota fiscal de número {notaFiscal.Numero}, no valor de R$ {notaFiscal.Valor?.ToString("C")}, " +
+                        $"O pagamento da nota fiscal de número {notaFiscal.Numero}, no valor de R$ {notaFiscal.Valor?.ToString("C", ptBrCulture)}, " +
                         $"foi realizado em {dataPagamento}.";
                     dto.Payload = new Dictionary<string, string>();
                     dto.Metadados = new Dictionary<string, string>();

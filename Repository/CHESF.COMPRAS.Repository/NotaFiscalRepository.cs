@@ -53,13 +53,13 @@ namespace CHESF.COMPRAS.Repository
         public async Task<IList<NotaFiscal>> ListarNotaFiscalPagasNaoNotificadas()
         {
             var situacoesPagamento = new List<int> {31, 35};
-            var indicadorPagamentoNotaFiscal = (int)NotaFiscal.StatusNotificacao.PagaENaoNotificada;
             return await _entities
                 .AsNoTracking()
                 .Include(notafiscal => notafiscal.Fornecedor)
                 .Include(notaFiscal => notaFiscal.StatusNotaFiscal)
                 .ThenInclude(statusNotaFiscal => statusNotaFiscal.Status)
-                .Where(notaFiscal => notaFiscal.IndicadorPagamentoNotaFiscal == indicadorPagamentoNotaFiscal)
+                .Where(notaFiscal => !notaFiscal.PagamentoNotificado 
+                                     && notaFiscal.HistoricoNotaFiscal.Any( historico => situacoesPagamento.Contains(historico.IdStatus)))
                 .OrderByDescending(notaFiscal => notaFiscal.DataEmissao)
                 .Select(notaFiscal => new NotaFiscal
                 {
@@ -77,6 +77,7 @@ namespace CHESF.COMPRAS.Repository
                     Contrato = notaFiscal.Contrato,
                     StatusNotaFiscal = notaFiscal.StatusNotaFiscal,
                     Fornecedor = notaFiscal.Fornecedor,
+                    PagamentoNotificado = notaFiscal.PagamentoNotificado,
                     HistoricoNotaFiscal = notaFiscal.HistoricoNotaFiscal,
                     DataPagamento = notaFiscal.HistoricoNotaFiscal.Where(
                             historico => situacoesPagamento.Contains(historico.IdStatus)).

@@ -10,13 +10,7 @@ namespace CHESF.COMPRAS.Domain.SGNF
     [Table("TB_NOTA_FISCAL")]
     public class NotaFiscal
     {
-        public enum StatusNotificacao
-        {
-            NaoPaga = 1,
-            PagaENaoNotificada = 2,
-            PagaENotificada = 3
-        }
-       
+        
         public NotaFiscal()
         {
             HistoricoNotaFiscal = new List<StatusNotaFiscal>();
@@ -47,7 +41,7 @@ namespace CHESF.COMPRAS.Domain.SGNF
         [Column("CD_NOTA_FISCAL_STATUS_NOTA")]
         public int? IdStatus { get; set; }
         
-        [Column("IC_PAGAMENTO_NOTIFICACAO ")] public int IndicadorPagamentoNotaFiscal { get; set; }
+        [Column("IC_PAGAMENTO_NOTIFICACAO")] public bool PagamentoNotificado { get; set; }
         
         [JsonIgnore]
         [ForeignKey("IdContrato")]

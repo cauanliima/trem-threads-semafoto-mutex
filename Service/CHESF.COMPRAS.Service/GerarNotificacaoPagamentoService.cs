@@ -48,7 +48,7 @@ namespace CHESF.COMPRAS.Service
                     dto.Titulo = "E-Compras - CHESF - Pagamento Realizado";
                     dto.Texto =
                         $"O pagamento da nota fiscal de número {notaFiscal.Numero}, no valor de {notaFiscal.Valor?.ToString("C", ptBrCulture)}, " +
-                        $"foi realizado em {dataPagamento}.";
+                        $"referente ao contrato {notaFiscal.Contrato?.Numero} , foi realizado em {dataPagamento}.";
                     dto.Payload = new Dictionary<string, string>();
                     dto.Metadados = new Dictionary<string, string>();
 
@@ -66,10 +66,10 @@ namespace CHESF.COMPRAS.Service
                     _logger.LogInformation("Resultado para o envio da notificação da nota fiscal de número {numero}", notaFiscal.Numero);
                     _logger.LogInformation(JsonSerializer.Serialize(resultado));
 
-                    notaFiscal.IndicadorPagamentoNotaFiscal = (int)NotaFiscal.StatusNotificacao.PagaENotificada;
+                    notaFiscal.PagamentoNotificado = true;
 
                     var entry = _notaFiscalRepository.GetEntry(notaFiscal);
-                    entry.Property(nf => nf.IndicadorPagamentoNotaFiscal).IsModified = true;
+                    entry.Property(nf => nf.PagamentoNotificado).IsModified = true;
                 }
                 catch (Exception e)
                 {

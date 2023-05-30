@@ -16,7 +16,7 @@ WORKDIR /app
 
 COPY ./Release ./
 
-ADD http://deb.debian.org/debian/pool/contrib/m/msttcorefonts/ttf-mscorefonts-installer_3.6_all.deb /ttf-mscorefonts-installer.deb
+ADD http://deb.debian.org/debian/pool/contrib/m/msttcorefonts/ttf-mscorefonts-installer_3.7_all.deb /ttf-mscorefonts-installer.deb
 RUN dpkg -i /ttf-mscorefonts-installer.deb
 RUN fc-cache -f
 RUN rm /ttf-mscorefonts-installer.deb

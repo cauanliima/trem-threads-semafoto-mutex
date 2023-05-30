@@ -13,6 +13,8 @@ namespace CHESF.COMPRAS.Domain.SGNF
         [Column("NM_FANTASIA")] public string NomeFantasia { get; set; }
         
         [Column("NM_RAZAO_SOCIAL")] public string RazaoSocial { get; set; }
+        
+        [Column("EN_EMAIL")] public string? Email { get; set; }
 
     }
 }

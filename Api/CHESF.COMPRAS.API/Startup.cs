@@ -114,6 +114,7 @@ namespace CHESF.COMPRAS.API
             services.AddTransient<IAnexoRepository, AnexoRepository>();
             services.AddTransient<IUsuarioRepository, UsuarioRepository>();
             services.AddTransient<IContratoRepository, ContratoRepository>();
+            services.AddTransient<IFornecedorRepository, FornecedorRepository>();
             services.AddTransient<IContratoFonecedorRepository, ContratoFornecedorRepository>();
             services.AddTransient<INotaFiscalRepository, NotaFiscalRepository>();
             services.AddTransient<IDispositivoRepository, DispositivoRepository>();
@@ -123,11 +124,15 @@ namespace CHESF.COMPRAS.API
 
             //Service
             services.AddTransient<ITokenService, TokenService>();
+            services.AddMemoryCache();
+            services.AddTransient<IOTPService, OTPService>();
             services.AddTransient<ILicitacaoService, LicitacaoService>();
             services.AddTransient<IAnexoService, AnexoService>();
             services.AddTransient<INotificationService, NotificationService>().AddOptions();
             services.AddTransient<ILoginService, LoginService>();
             services.AddTransient<IContratoService, ContratoService>();
+            services.AddTransient<IFornecedorService, FornecedorService>();
+            services.AddTransient<IOTPCache, OTPCache>();
             services.AddTransient<IGerarNotificacaoPagamentoService, GerarNotificacaoPagamentoService>();
 
             services.AddScoped<DispositivoUidAttribute>();

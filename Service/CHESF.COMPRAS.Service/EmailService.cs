@@ -56,8 +56,10 @@ namespace CHESF.COMPRAS.Service
                 //     .ToDictionaryAsync(parametro => parametro.NmParametro, parametro => parametro.VlParametro);
                 
                 Dictionary<string, string> parametros = new Dictionary<string, string>();
-                parametros.Add("SMTP_HOST", "Teste");
+                parametros.Add("SMTP_HOST", "sandbox.smtp.mailtrap.io");
                 parametros.Add("EMAIL_PARA", "joilsonabrantes@gmail.com");
+                parametros.Add("SMTP_USUARIO", "81347496a5acf7");
+                parametros.Add("SMTP_SENHA", "e8ecd9aee89e95");
 
                 var para = parametros.GetValueOrDefault("EMAIL_PARA", "").Split(";").ToList();
                 var html = await _templateService.GetTemplateHtmlStringAsync($"Email/{view}", modelo, custom, environment);

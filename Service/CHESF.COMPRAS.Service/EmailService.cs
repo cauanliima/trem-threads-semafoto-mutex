@@ -78,7 +78,7 @@ namespace CHESF.COMPRAS.Service
 
                 try
                 {
-                    if (environment is "LOCAL" or "DEV")
+                    if (environment is "LOCAL")
                     {
                         host = localHost;
                         username = localUser;

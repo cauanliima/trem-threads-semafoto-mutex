@@ -1,8 +1,10 @@
-﻿namespace CHESF.COMPRAS.IService
+﻿using System.Threading.Tasks;
+
+namespace CHESF.COMPRAS.IService
 {
     public interface IOTPService
     {
-        string gerarOTP(long cnpj);
+        Task<string>  gerarOTP(long cnpj);
         bool validarOTP(long cnpj, string otp);
     }
 }

@@ -126,6 +126,8 @@ namespace CHESF.COMPRAS.API
             services.AddTransient<ITokenService, TokenService>();
             services.AddMemoryCache();
             services.AddTransient<IOTPService, OTPService>();
+            services.AddTransient<IEmailService, EmailService>();
+            services.AddTransient<ITemplateService, TemplateService>();
             services.AddTransient<ILicitacaoService, LicitacaoService>();
             services.AddTransient<IAnexoService, AnexoService>();
             services.AddTransient<INotificationService, NotificationService>().AddOptions();
@@ -134,6 +136,9 @@ namespace CHESF.COMPRAS.API
             services.AddTransient<IFornecedorService, FornecedorService>();
             services.AddTransient<IOTPCache, OTPCache>();
             services.AddTransient<IGerarNotificacaoPagamentoService, GerarNotificacaoPagamentoService>();
+            
+            services.AddControllersWithViews();
+            services.AddRazorPages();
 
             services.AddScoped<DispositivoUidAttribute>();
 

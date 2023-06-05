@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using CHESF.COMPRAS.Domain.DTOs;
 using CHESF.COMPRAS.Domain.Exception;
 using CHESF.COMPRAS.Domain.SGNF;
 using CHESF.COMPRAS.IService;
@@ -12,17 +14,19 @@ namespace CHESF.COMPRAS.Service
         
         private readonly IOTPCache _cache;
         private readonly IFornecedorService _fornecedorService;
+        private readonly IEmailService _emailService;
 
         
-        public OTPService(IOTPCache cache, IFornecedorService fornecedorService)
+        public OTPService(IOTPCache cache, IFornecedorService fornecedorService, IEmailService emailService)
         {
             _cache = cache;
             _fornecedorService = fornecedorService;
+            _emailService = emailService;
         }
         
-        public string gerarOTP(long cnpj)
+        public async Task<string> gerarOTP(long cnpj)
         {
-            
+
             var fornecedor =  _fornecedorService.buscar(cnpj);
             validarFornecedor(fornecedor);
             int tempoExpiracaoMinutos = 10; 
@@ -32,7 +36,20 @@ namespace CHESF.COMPRAS.Service
             DateTime dataExpiracao = DateTime.Now.AddMinutes(tempoExpiracaoMinutos);
             // Armazenar o OTP e o tempo de expiração no cache
             _cache.SetOTP(cnpj, otp.ToString(), dataExpiracao);
-            return otp.ToString();
+            var destinatarios = new List<string?> {};
+            destinatarios.Add(fornecedor.Result?.Email);
+            var model = new CustomModelDTO()
+            {
+                Destinatarios = destinatarios,
+                Message = "Código OTP de Verificação - E-COMPRAS/SGNF"
+            };
+            await _emailService.EnviarEmail(
+                "CodigoOTP",
+                otp.ToString(),
+                $"Código OTP de Verificação - E-COMPRAS/SGNF",
+                model
+            );
+            return "Código OTP enviado para o e-mail: " + fornecedor.Result?.Email;;
         }
 
         private void validarFornecedor(Task<Fornecedor?> fornecedor)

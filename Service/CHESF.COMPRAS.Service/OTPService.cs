@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using CHESF.COMPRAS.Domain.DTOs;
 using CHESF.COMPRAS.Domain.Exception;
@@ -29,9 +30,8 @@ namespace CHESF.COMPRAS.Service
 
             var fornecedor =  _fornecedorService.buscar(cnpj);
             validarFornecedor(fornecedor);
-            int tempoExpiracaoMinutos = 10; 
-            Random random = new Random();
-            int otp = random.Next(100000, 999999);
+            int tempoExpiracaoMinutos = 10;
+            int otp = RandomNumberGenerator.GetInt32(100000, 999999);
             // Calcular o tempo de expiração
             DateTime dataExpiracao = DateTime.Now.AddMinutes(tempoExpiracaoMinutos);
             // Armazenar o OTP e o tempo de expiração no cache

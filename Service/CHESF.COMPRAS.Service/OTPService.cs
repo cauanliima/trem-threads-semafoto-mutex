@@ -29,7 +29,9 @@ namespace CHESF.COMPRAS.Service
         {
 
             var fornecedor =  _fornecedorService.buscar(cnpj);
-            validarFornecedor(fornecedor);
+            
+            ValidarFornecedor(fornecedor);
+
             int tempoExpiracaoMinutos = 10;
             int otp = RandomNumberGenerator.GetInt32(100000, 999999);
             // Calcular o tempo de expiração
@@ -52,16 +54,18 @@ namespace CHESF.COMPRAS.Service
             return "Código OTP enviado para o e-mail: " + fornecedor.Result?.Email;;
         }
 
-        private void validarFornecedor(Task<Fornecedor?> fornecedor)
+        private static void ValidarFornecedor(Task<Fornecedor?>? fornecedor)
         {
             if (fornecedor == null || fornecedor.Result == null)
             {
-                throw new HttpResponseException(409, "Não foi possível enviar o código de verificação para esse CNPJ. Verifique o CNPJ e tente novamente.");
+                throw new HttpResponseException(409,
+                    "Não foi possível enviar o código de verificação para esse CNPJ. Verifique o CNPJ e tente novamente.");
             }
 
             if (string.IsNullOrEmpty(fornecedor.Result.Email))
             {
-                throw new HttpResponseException(409, "Não foi possível enviar o código de verificação para esse CNPJ. O fornecedor não possui e-mail cadastrado no SGNF.");
+                throw new HttpResponseException(409,
+                    "Não foi possível enviar o código de verificação para esse CNPJ. O fornecedor não possui e-mail cadastrado no SGNF.");
             }
         }
 

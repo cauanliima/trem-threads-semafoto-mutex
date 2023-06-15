@@ -31,8 +31,8 @@ namespace CHESF.COMPRAS.API.Controllers
             try
             {
                 if (!ModelState.IsValid) return BadRequest();
-                var otp = _otpService.gerarOTP(cnpj);
-                return Ok(otp.Result);  
+                var otp = await _otpService.gerarOTP(cnpj);
+                return Ok(otp);  
             }
             catch (HttpResponseException rex)
             {

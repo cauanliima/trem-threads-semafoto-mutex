@@ -51,7 +51,7 @@ namespace CHESF.COMPRAS.Service
                 $"Código OTP de Verificação - E-COMPRAS/SGNF",
                 model
             );
-            return "Código OTP enviado para o e-mail: " + fornecedor.Result?.Email;;
+            return "Código OTP enviado para o e-mail: " + MaskEmail(fornecedor.Result?.Email);
         }
 
         private static void ValidarFornecedor(Task<Fornecedor?>? fornecedor)
@@ -68,7 +68,20 @@ namespace CHESF.COMPRAS.Service
                     "Não foi possível enviar o código de verificação para esse CNPJ. O fornecedor não possui e-mail cadastrado no SGNF.");
             }
         }
-
+        
+        private static string MaskEmail(string email)
+        {
+            int atIndex = email.IndexOf("@");
+            if (atIndex > 0)
+            {
+                string username = email.Substring(0, atIndex);
+                int halfLength = username.Length / 2;
+                string maskedPart = username.Substring(0, halfLength) + new string('*', username.Length - halfLength);
+                string domainPart = email.Substring(atIndex);
+                return maskedPart + domainPart;
+            }
+            return email;
+        }
         public bool validarOTP(long cnpj, string otp)
         {
 

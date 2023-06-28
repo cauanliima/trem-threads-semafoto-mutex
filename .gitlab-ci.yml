@@ -69,3 +69,17 @@ Implantar aplicação no Rancher:
     - develop
   dependencies:
     - Dockerizar versão mais recente
+
+Requisitar implantação da infra:
+  image: harbor.chesf.gov.br/dgcds/gitlab-mr-deploy
+  stage: Implantação
+  before_script:
+    - configurar-git
+  script:
+    - sed -i "s/CI_COMMIT_TAG/$CI_COMMIT_TAG/g" ./chart/answers_hmg.yaml
+    - sed -i "s/CI_COMMIT_TAG/$CI_COMMIT_TAG/g" ./chart/answers_prod.yaml
+    - abrir-mr-deploy
+  only:
+    - tags
+  dependencies:
+    - Dockerizar tag

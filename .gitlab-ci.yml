@@ -58,13 +58,18 @@ Dockerizar tag:
     - Construir e empacotar DLLs
 
 Implantar aplicação no Rancher:
-  image: logapenvironment/rancher
+  image: dirceusilva/base_k8s_python:latest
   stage: Implantação
   environment:
     name: qualidade
   script:
-    - rancher login $RANCHER_API_URL --token $RANCHER_BEARER_TOKEN --context $RANCHER_PROJECT_ID
-    - rancher kubectl rollout restart deployment/compras-dev --namespace compras
+    - echo "${KUBE_CONFIG_DEV}" | base64 -d > /config
+    - export KUBECONFIG=/config
+    - git clone https://${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD}@gitlab.com/chesf.gov.br/infra/devops/helm-charts.git
+    - cat -A chart/answers_dev.yaml
+    - yq -p=props chart/answers_dev.yaml | tr -d "'" > chart/values.yaml
+    - cat chart/values.yaml
+    - helm upgrade --force -i e-compras -n e-compras  helm-charts/charts/e-compras --reuse-values -f chart/values.yaml
   only:
     - develop
   dependencies:
